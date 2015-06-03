@@ -276,8 +276,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
             gblphidat gblPhi;
             try {
-                //gblPhi = srLUTs_[fpga]->globalPhiME(lclPhi.phi_local, lct->getKeyWG(), cscId+1, gangedME1a_);
-                gblPhi = srLUTs_[fpga]->globalPhiME_Test(lclPhi.phi_local, lct->getKeyWG(), cscId+1, lct->getStrip(), gangedME1a_);
+                gblPhi = srLUTs_[fpga]->globalPhiME(lclPhi.phi_local, lct->getKeyWG(), cscId+1, gangedME1a_);
             } catch(cms::Exception &) {
                 bzero(&gblPhi,sizeof(gblPhi));
             }
