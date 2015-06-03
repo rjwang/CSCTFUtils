@@ -3,6 +3,8 @@ all:
 run:
 	@rm csctf.log
 	@cmsRun run_offline_dqm_csctf_cfg.py > csctf.log
+test:
+	@cmsRun run_offline_dqm_csctf_cfg.py
 fit:
 	@root -l -b -q readLCTAnalyzer.cc++ > output_lct.log
 plot:

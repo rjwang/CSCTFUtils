@@ -12,7 +12,7 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True),
 
 
 ##testing
-globalTagValue = 'GR_H_V26'
+globalTagValue = 'GR_H_V58'
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.GlobalTag.connect = 'frontier://FrontierProd/CMS_COND_31X_GLOBALTAG'
 process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
@@ -37,18 +37,18 @@ process.source = cms.Source("PoolSource",
 	#'/store/data/Commissioning2015/Cosmics/RAW/v1/000/237/956/00000/06220D5A-00CB-E411-8F09-02163E012785.root',
 	#'/store/data/Commissioning2015/Cosmics/RAW/v1/000/237/956/00000/08699835-F6CA-E411-B762-02163E011801.root',
 	#'/store/data/Commissioning2015/Cosmics/RAW/v1/000/237/956/00000/0A19AAF0-EFCA-E411-AF04-02163E012379.root',
-	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/923/00000/0EDA384D-EC09-E511-95CE-02163E0143E9.root',
+
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/926/00000/6A496D1A-F709-E511-B2B9-02163E0145D2.root',
     )
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("csctf_Run246923.root")
+                                   fileName = cms.string("csctf_Run246926.root")
                                   )
 
 
 #process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
-
 
 #-------------------------------------
 # sequences needed for L1 trigger DQM

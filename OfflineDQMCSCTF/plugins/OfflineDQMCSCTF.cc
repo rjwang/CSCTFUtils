@@ -40,8 +40,6 @@
 #include "DataFormats/L1CSCTrackFinder/interface/CSCTriggerContainer.h"
 #include "DataFormats/L1CSCTrackFinder/interface/TrackStub.h"
 
-#include "Geometry/Records/interface/MuonGeometryRecord.h"
-
 #include "DataFormats/L1GlobalMuonTrigger/interface/L1MuRegionalCand.h"
 #include "DataFormats/L1GlobalMuonTrigger/interface/L1MuGMTCand.h"
 #include "DataFormats/L1GlobalMuonTrigger/interface/L1MuGMTExtendedCand.h"
@@ -182,6 +180,9 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     edm::ESHandle<CSCGeometry> cscGeometry;
     iSetup.get<MuonGeometryRecord>().get(cscGeometry);
 
+    //  edm::ESHandle<CSCGeometry> pDD;
+    //  c.get<MuonGeometryRecord>().get( pDD );
+    CSCTriggerGeometry::setGeometry(cscGeometry);
 
     edm::Handle<CSCCorrelatedLCTDigiCollection> corrlcts;
     iEvent.getByToken(corrlctsToken_, corrlcts);
