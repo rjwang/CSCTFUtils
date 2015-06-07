@@ -161,11 +161,7 @@ dofit(std::vector<double> allphiG, std::vector<double> alletaG, std::vector<doub
 	    double zG = tofit_zG[n];
 
 	    double theta = 2.*TMath::ATan(exp(-1.*etaG));
-            //cout << "-->theta: " << theta << endl;
-	    //double r = zG/TMath::Cos(theta);
 
-	    //double x = r*TMath::Sin(theta)*TMath::Cos(phiG);
-	    //double y = r*TMath::Sin(theta)*TMath::Sin(phiG);
 	    double z = zG;
 	    double y = z*TMath::Tan(theta);
 	    double x = y/TMath::Tan(phiG);
@@ -362,13 +358,10 @@ void readLCTAnalyzer(TString _input_="./csctf_Run246926.root", TString _output_=
         //outfile << "------------------" << endl;
 
 	if(allphiG.size()<5) continue;
-        //std::vector<std::pair<double,double> > deltaPhiEtas = dofit(allphiG,alletaG,allzG);
 	std::vector<CSCTF_t> deltaPhiEtas = dofit(allphiG,alletaG,allzG,allendcap,allstation,allring);
 
 
         for(size_t j=0; j<deltaPhiEtas.size(); j++) {
-//            double d_phi = deltaPhiEtas[j].first;
-//            double d_eta = deltaPhiEtas[j].second;
 	    int status = deltaPhiEtas[j].status;
 	    if(status!=0) continue;
             float d_phi = deltaPhiEtas[j].dphi;
