@@ -16,6 +16,7 @@ test/old
 test/*dict_rdict*
 test/*.so
 test/*.d
+test/crab
 # no private directory
 backup
 private

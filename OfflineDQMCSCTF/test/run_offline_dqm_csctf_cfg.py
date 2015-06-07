@@ -72,7 +72,7 @@ process.source = cms.Source("PoolSource",
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("csctf_Run246963.root")
+                                   fileName = cms.string("/tmp/rewang/csctf_Run246963.root")
                                   )
 
 

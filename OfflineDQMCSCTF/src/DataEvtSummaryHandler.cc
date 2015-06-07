@@ -14,16 +14,22 @@ bool DataEvtSummaryHandler::initTree(TTree *t)
     t_ = t;
 
 
-    t_->Branch("nlcts", 	&evSummary_.nlcts,   "nlcts/I");
-    t_->Branch("lct_gblphi",         evSummary_.lct_gblphi,           "lct_gblphi[nlcts]/F");
-    t_->Branch("lct_gbleta",         evSummary_.lct_gbleta,           "lct_gbleta[nlcts]/F");
-    t_->Branch("lct_gblZ",         evSummary_.lct_gblZ,           "lct_gblZ[nlcts]/F");
+    t_->Branch("nlcts_m", 	&evSummary_.nlcts_m,   "nlcts_m/I");
 
+    t_->Branch("lct_m_gblphi",         evSummary_.lct_m_gblphi,           "lct_m_gblphi[nlcts_m]/F");
+    t_->Branch("lct_m_gbleta",         evSummary_.lct_m_gbleta,           "lct_m_gbleta[nlcts_m]/F");
+    t_->Branch("lct_m_gblZ",         evSummary_.lct_m_gblZ,           "lct_m_gblZ[nlcts_m]/F");
+    t_->Branch("lct_m_station",         evSummary_.lct_m_station,           "lct_m_station[nlcts_m]/I");
+    t_->Branch("lct_m_ring",         evSummary_.lct_m_ring,           "lct_m_ring[nlcts_m]/I");
+    t_->Branch("lct_m_endcap",         evSummary_.lct_m_endcap,           "lct_m_endcap[nlcts_m]/I");
 
-
-    t_->Branch("lct_station",         evSummary_.lct_station,           "lct_station[nlcts]/I");
-    t_->Branch("lct_ring",         evSummary_.lct_ring,           "lct_ring[nlcts]/I");
-    t_->Branch("lct_endcap",         evSummary_.lct_endcap,           "lct_endcap[nlcts]/I");
+    t_->Branch("nlcts_p",       &evSummary_.nlcts_p,   "nlcts_p/I");
+    t_->Branch("lct_p_gblphi",         evSummary_.lct_p_gblphi,           "lct_p_gblphi[nlcts_p]/F");
+    t_->Branch("lct_p_gbleta",         evSummary_.lct_p_gbleta,           "lct_p_gbleta[nlcts_p]/F");
+    t_->Branch("lct_p_gblZ",         evSummary_.lct_p_gblZ,           "lct_p_gblZ[nlcts_p]/F");
+    t_->Branch("lct_p_station",         evSummary_.lct_p_station,           "lct_p_station[nlcts_p]/I");
+    t_->Branch("lct_p_ring",         evSummary_.lct_p_ring,           "lct_p_ring[nlcts_p]/I");
+    t_->Branch("lct_p_endcap",         evSummary_.lct_p_endcap,           "lct_p_endcap[nlcts_p]/I");
 
 
 
@@ -40,15 +46,22 @@ bool DataEvtSummaryHandler::attachToTree(TTree *t)
     t_ = t;
 
 
-    t_->SetBranchAddress("nlcts", 	&evSummary_.nlcts);
-    t_->SetBranchAddress("lct_gblphi",           evSummary_.lct_gblphi);
-    t_->SetBranchAddress("lct_gbleta",           evSummary_.lct_gbleta);
-    t_->SetBranchAddress("lct_gblZ",           evSummary_.lct_gblZ);
+    t_->SetBranchAddress("nlcts_m", 	&evSummary_.nlcts_m);
 
+    t_->SetBranchAddress("lct_m_gblphi",           evSummary_.lct_m_gblphi);
+    t_->SetBranchAddress("lct_m_gbleta",           evSummary_.lct_m_gbleta);
+    t_->SetBranchAddress("lct_m_gblZ",           evSummary_.lct_m_gblZ);
+    t_->SetBranchAddress("lct_m_station",           evSummary_.lct_m_station);
+    t_->SetBranchAddress("lct_m_ring",           evSummary_.lct_m_ring);
+    t_->SetBranchAddress("lct_m_endcap",           evSummary_.lct_m_endcap);
 
-    t_->SetBranchAddress("lct_station",           evSummary_.lct_station);
-    t_->SetBranchAddress("lct_ring",           evSummary_.lct_ring);
-    t_->SetBranchAddress("lct_endcap",           evSummary_.lct_endcap);
+    t_->SetBranchAddress("nlcts_p",       &evSummary_.nlcts_p);
+    t_->SetBranchAddress("lct_p_gblphi",           evSummary_.lct_p_gblphi);
+    t_->SetBranchAddress("lct_p_gbleta",           evSummary_.lct_p_gbleta);
+    t_->SetBranchAddress("lct_p_gblZ",           evSummary_.lct_p_gblZ);
+    t_->SetBranchAddress("lct_p_station",           evSummary_.lct_p_station);
+    t_->SetBranchAddress("lct_p_ring",           evSummary_.lct_p_ring);
+    t_->SetBranchAddress("lct_p_endcap",           evSummary_.lct_p_endcap);
 
 
 
@@ -60,7 +73,8 @@ bool DataEvtSummaryHandler::attachToTree(TTree *t)
 //
 void DataEvtSummaryHandler::resetStruct()
 {
-    evSummary_.nlcts=0;
+    evSummary_.nlcts_m=0;
+    evSummary_.nlcts_p=0;
 }
 
 //

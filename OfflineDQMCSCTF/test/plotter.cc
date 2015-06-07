@@ -13,8 +13,8 @@ void plotter()
 
     vector<TString> All1Dhists;
 
-    All1Dhists.push_back("d_phi");
-    All1Dhists.push_back("d_eta");
+    All1Dhists.push_back("h_deltaPhi");
+    All1Dhists.push_back("h_deltaEta");
 
     All1Dhists.push_back("h_deltaPhiMEp11");
     All1Dhists.push_back("h_deltaPhiMEp12");
@@ -58,11 +58,17 @@ void plotter()
     All1Dhists.push_back("h_deltaEtaMEm41");
     All1Dhists.push_back("h_deltaEtaMEm42");
 
-    All1Dhists.push_back("h_p0");
-    All1Dhists.push_back("h_p1");
-    All1Dhists.push_back("h_p2");
-    All1Dhists.push_back("h_p3");
-    All1Dhists.push_back("h_dR");
+    All1Dhists.push_back("h_m_p0");
+    All1Dhists.push_back("h_m_p1");
+    All1Dhists.push_back("h_m_p2");
+    All1Dhists.push_back("h_m_p3");
+    All1Dhists.push_back("h_m_distance");
+
+    All1Dhists.push_back("h_p_p0");
+    All1Dhists.push_back("h_p_p1");
+    All1Dhists.push_back("h_p_p2");
+    All1Dhists.push_back("h_p_p3");
+    All1Dhists.push_back("h_p_distance");
 
 
 

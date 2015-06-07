@@ -27,9 +27,14 @@ struct DataEvtSummary_t {
 
 
     //gen level event
-    Int_t nlcts;
-    Float_t lct_gblphi[MAXLUTS], lct_gbleta[MAXLUTS], lct_gblZ[MAXLUTS];
-    Int_t lct_station[MAXLUTS], lct_ring[MAXLUTS], lct_endcap[MAXLUTS];
+    Int_t nlcts_m;
+    Float_t lct_m_gblphi[MAXLUTS], lct_m_gbleta[MAXLUTS], lct_m_gblZ[MAXLUTS];
+    Int_t lct_m_station[MAXLUTS], lct_m_ring[MAXLUTS], lct_m_endcap[MAXLUTS];
+
+    Int_t nlcts_p;
+    Float_t lct_p_gblphi[MAXLUTS], lct_p_gbleta[MAXLUTS], lct_p_gblZ[MAXLUTS];
+    Int_t lct_p_station[MAXLUTS], lct_p_ring[MAXLUTS], lct_p_endcap[MAXLUTS];
+
 
 };
 

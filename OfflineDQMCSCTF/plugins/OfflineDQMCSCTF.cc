@@ -188,15 +188,24 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     iEvent.getByToken(corrlctsToken_, corrlcts);
 
     //std::cout << "\n ======= lctProducer ======= " << std::endl;
-    std::vector<int> saveEndcaps;
-    std::vector<int> saveStations;
-    std::vector<int> saveRings;
-    std::vector<int> saveCscId;
-    std::vector<int> saveSector;
+    std::vector<int> saveEndcaps_m;
+    std::vector<int> saveStations_m;
+    std::vector<int> saveRings_m;
+    std::vector<int> saveCscId_m;
+    std::vector<int> saveSector_m;
+    std::vector<double> saveGblPhi_m;
+    std::vector<double> saveGblEta_m;
+    std::vector<double> saveGblZ_m;
 
-    std::vector<double> saveGblPhi;
-    std::vector<double> saveGblEta;
-    std::vector<double> saveGblZ;
+    std::vector<int> saveEndcaps_p;
+    std::vector<int> saveStations_p;
+    std::vector<int> saveRings_p;
+    std::vector<int> saveCscId_p;
+    std::vector<int> saveSector_p;
+    std::vector<double> saveGblPhi_p;
+    std::vector<double> saveGblEta_p;
+    std::vector<double> saveGblZ_p;
+
 
     for(CSCCorrelatedLCTDigiCollection::DigiRangeIterator csc=corrlcts.product()->begin(); csc!=corrlcts.product()->end(); csc++) {
         CSCCorrelatedLCTDigiCollection::Range range1 = corrlcts.product()->get((*csc).first);
@@ -213,8 +222,8 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
             int bx        = lct -> getBX();
             int quality   = lct -> getQuality();
             int bend      = lct -> getBend();
-
-            int endcapAssignment = 1;
+/*
+            //int endcapAssignment = 1;
             int shift = 1;
             float sectorArg = sector;
             //float sectorArg = j;
@@ -225,9 +234,9 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 //sectorArg = sector - 6;
             }
 
-            int signedStation = (station + shift)* endcapAssignment;
-            if( (station == 0) && (endcap == 0)) signedStation = subSector - 1;
-            if( (station == 0) && (endcap == 1)) signedStation = (-1)*subSector;
+            //int signedStation = (station + shift)* endcapAssignment;
+            //if( (station == 0) && (endcap == 0)) signedStation = subSector - 1;
+            //if( (station == 0) && (endcap == 1)) signedStation = (-1)*subSector;
 
             float chamberArg1 = cscId * 0.1 + sectorArg;
             //float chamberArg1 = i*0.1 + sectorArg;
@@ -239,8 +248,8 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
             if(sectorArg == 3) chamberArg1 = chamberArg11 - 0.3;
             if(sectorArg == 4) chamberArg1 = chamberArg11 - 0.4;
             if(sectorArg == 5) chamberArg1 = chamberArg11 - 0.5;
-
-            if(verbose_) std::cout << "cscId, station, sector, endcap, sectorArg, chamber Arg: " << cscId << ", " << station << ", " <<sector << ", " << endcap << ", " << chamberArg1 << ", " << signedStation << std::endl;
+*/
+            //if(verbose_) std::cout << "cscId, station, sector, endcap, sectorArg, chamber Arg: " << cscId << ", " << station << ", " <<sector << ", " << endcap << ", " << chamberArg1 << ", " << signedStation << std::endl;
 
             //csctfChamberOccupancies->Fill(chamberArg1, signedStation);
             //int bunchX = ( (lct->getBX()) - 6 );
@@ -317,7 +326,9 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
             //SECTOR_RAD = CSCTFConstants::SECTOR_DEG*CSCTFConstants::RAD_PER_DEGREE;
 
 
-            if (verbose_) {
+
+	    bool showdetails(false);
+            if (verbose_ && showdetails) {
                 cout << "\n ===== Current LCT Values ====== \n";
                 cout << " Endcap    = " << endcap           << endl;
                 cout << " Station   = " << station          << endl;
@@ -348,87 +359,122 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
             globalZ = cscGeometry->idToDet(_cscid_)->position().z();
 	    if(globalZ<0) etaG *= -1;
 
-            saveEndcaps.push_back(endcap);
-            saveStations.push_back(station);
-            saveRings.push_back(ring);
-	    saveCscId.push_back(cscId);
-	    saveSector.push_back(sector);
+	    if(endcap==0) {
+            	saveEndcaps_p.push_back(endcap);
+            	saveStations_p.push_back(station);
+            	saveRings_p.push_back(ring);
+            	saveGblPhi_p.push_back(phiG);
+            	saveGblEta_p.push_back(etaG);
+            	saveGblZ_p.push_back(globalZ);
+	    	saveCscId_p.push_back(cscId);
+	    	saveSector_p.push_back(sector);
+	    }
+	    else if(endcap==1) {
+            	saveEndcaps_m.push_back(endcap);
+            	saveStations_m.push_back(station);
+            	saveRings_m.push_back(ring);
+            	saveGblPhi_m.push_back(phiG);
+            	saveGblEta_m.push_back(etaG);
+            	saveGblZ_m.push_back(globalZ);
+	    	saveCscId_m.push_back(cscId);
+	    	saveSector_m.push_back(sector);
+	    }
 
-            saveGblPhi.push_back(phiG);
-            //saveGblPhi.push_back(TMath::ACos(fabs(cos(phiG))) ); // for resolution study
-            saveGblEta.push_back(etaG);
-            saveGblZ.push_back(globalZ);
 
 
 
-            //double xx = 1.*TMath::Cos(phiG);
-            //double yy = 1.*TMath::Sin(phiG);
-            //double zz = 1.*sinh(etaG);
-
-
-            /////////////////////////////////////////
-
-            /*
-                        std::cout << " endcap: " << endcap
-                                  << " station: " << station
-                                  << " ring: " << ring
-                                  << " CscId: " << cscId
-                                  << " sector: " << sector
-                                  << " subSector: " << subSector
-                                  << " strip: " << strip
-                                  << " WG: " << keyWire
-                                  << " GlobalPhi: " << phiG
-                                  << " GlobalEta: " << etaG
-                                  << " xx: " << xx
-                                  << " yy: " << yy
-                                  << " zz: " << zz
-                                  << std::endl;
-            */
 
         } // lct != range1.scond
     } // csc!=corrlcts.product()->end()
 
 
-    //resolution of LUTs
-    ev.nlcts = 0;
-    if(saveGblPhi.size()>4) {
+    //resolution of LUTs -- Minus EndCap
+    ev.nlcts_m = 0;
+    if(saveGblPhi_m.size()>4) {
 
-        bool hasSameSector(true);
-        for(size_t i=0; i<saveSector.size(); i++) {
-            if(i==saveSector.size()-1) break;
-            hasSameSector &= (saveSector[i]==saveSector[i+1]);
+        bool hasSameSector_m(true);
+        for(size_t i=0; i<saveSector_m.size(); i++) {
+            if(i==saveSector_m.size()-1) break;
+            hasSameSector_m &= (saveSector_m[i]==saveSector_m[i+1]);
         }
 
-        if(hasSameSector) {
+        if(hasSameSector_m) {
 
 	    if (verbose_) std::cout << "\n ======= LUT Resolution ======= " << std::endl;
-            for(size_t j=0; j<saveGblPhi.size(); j++) {
+            for(size_t j=0; j<saveGblPhi_m.size(); j++) {
 
 		if (verbose_) {
-			std::cout << " Endcap: "    << saveEndcaps[j]
-			  << " Station: "   << saveStations[j]
-			  << " Ring: " 	    << saveRings[j]
-			  << " CSCID: "     << saveCscId[j]
-			  << " Sector: "    << saveSector[j]
-                	  << " GlobalPhi: " << saveGblPhi[j]
-                          << " GlobalEta: " << saveGblEta[j]
-			  << " GlobalZ: "   << saveGblZ[j]
+			std::cout << " Endcap: "    << saveEndcaps_m[j]
+			  << " Station: "   << saveStations_m[j]
+			  << " Ring: " 	    << saveRings_m[j]
+			  << " CSCID: "     << saveCscId_m[j]
+			  << " Sector: "    << saveSector_m[j]
+                	  << " GlobalPhi: " << saveGblPhi_m[j]
+                          << " GlobalEta: " << saveGblEta_m[j]
+			  << " GlobalZ: "   << saveGblZ_m[j]
                           << std::endl;
 		}
 
-                ev.lct_gblphi[ev.nlcts] = saveGblPhi[j];
-                ev.lct_gbleta[ev.nlcts] = saveGblEta[j];
-		ev.lct_gblZ[ev.nlcts] = saveGblZ[j];
-                ev.lct_endcap[ev.nlcts] = saveEndcaps[j];
-                ev.lct_station[ev.nlcts]= saveStations[j];
-                ev.lct_ring[ev.nlcts]   = saveRings[j];
+                ev.lct_m_gblphi[ev.nlcts_m] = saveGblPhi_m[j];
+                ev.lct_m_gbleta[ev.nlcts_m] = saveGblEta_m[j];
+		ev.lct_m_gblZ[ev.nlcts_m] = saveGblZ_m[j];
+                ev.lct_m_endcap[ev.nlcts_m] = saveEndcaps_m[j];
+                ev.lct_m_station[ev.nlcts_m]= saveStations_m[j];
+                ev.lct_m_ring[ev.nlcts_m]   = saveRings_m[j];
 
-                ev.nlcts++;
+                ev.nlcts_m++;
             }
         }
-
-
     }
+
+
+    //resolution of LUTs -- Plus EndCap
+    ev.nlcts_p = 0;
+    if(saveGblPhi_p.size()>4) {
+
+        bool hasSameSector_p(true);
+        for(size_t i=0; i<saveSector_p.size(); i++) {
+            if(i==saveSector_p.size()-1) break;
+            hasSameSector_p &= (saveSector_p[i]==saveSector_p[i+1]);
+        }
+
+        if(hasSameSector_p) {
+
+	    if (verbose_) std::cout << "\n ======= LUT Resolution ======= " << std::endl;
+            for(size_t j=0; j<saveGblPhi_p.size(); j++) {
+
+		if (verbose_) {
+			std::cout << " Endcap: "    << saveEndcaps_p[j]
+			  << " Station: "   << saveStations_p[j]
+			  << " Ring: " 	    << saveRings_p[j]
+			  << " CSCID: "     << saveCscId_p[j]
+			  << " Sector: "    << saveSector_p[j]
+                	  << " GlobalPhi: " << saveGblPhi_p[j]
+                          << " GlobalEta: " << saveGblEta_p[j]
+			  << " GlobalZ: "   << saveGblZ_p[j]
+                          << std::endl;
+		}
+
+                ev.lct_p_gblphi[ev.nlcts_p] = saveGblPhi_p[j];
+                ev.lct_p_gbleta[ev.nlcts_p] = saveGblEta_p[j];
+		ev.lct_p_gblZ[ev.nlcts_p] = saveGblZ_p[j];
+                ev.lct_p_endcap[ev.nlcts_p] = saveEndcaps_p[j];
+                ev.lct_p_station[ev.nlcts_p]= saveStations_p[j];
+                ev.lct_p_ring[ev.nlcts_p]   = saveRings_p[j];
+
+                ev.nlcts_p++;
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
 
 
     summaryHandler_.fillTree();
