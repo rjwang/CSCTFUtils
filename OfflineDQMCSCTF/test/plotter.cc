@@ -58,6 +58,15 @@ void plotter()
     All1Dhists.push_back("h_deltaEtaMEm41");
     All1Dhists.push_back("h_deltaEtaMEm42");
 
+    All1Dhists.push_back("h_p0");
+    All1Dhists.push_back("h_p1");
+    All1Dhists.push_back("h_p2");
+    All1Dhists.push_back("h_p3");
+    All1Dhists.push_back("h_dR");
+
+
+
+
 
 
 

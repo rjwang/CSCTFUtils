@@ -11,6 +11,11 @@ LSFJOB*
 # no python init file
 python/__init__.py
 
+test/*.root
+test/old
+test/*dict_rdict*
+test/*.so
+test/*.d
 # no private directory
 backup
 private

@@ -346,6 +346,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
             CSCDetId _cscid_(endcap+1, station+1, ring, sector+1);
             double globalZ(0);
             globalZ = cscGeometry->idToDet(_cscid_)->position().z();
+	    if(globalZ<0) etaG *= -1;
 
             saveEndcaps.push_back(endcap);
             saveStations.push_back(station);
@@ -353,8 +354,8 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 	    saveCscId.push_back(cscId);
 	    saveSector.push_back(sector);
 
-            //saveGblPhi.push_back(phiG);
-            saveGblPhi.push_back(TMath::ACos(fabs(cos(phiG))) ); // for resolution study
+            saveGblPhi.push_back(phiG);
+            //saveGblPhi.push_back(TMath::ACos(fabs(cos(phiG))) ); // for resolution study
             saveGblEta.push_back(etaG);
             saveGblZ.push_back(globalZ);
 
@@ -400,9 +401,11 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
         if(hasSameSector) {
 
-            std::cout << "\n ======= LUT Resolution ======= " << std::endl;
+	    if (verbose_) std::cout << "\n ======= LUT Resolution ======= " << std::endl;
             for(size_t j=0; j<saveGblPhi.size(); j++) {
-		std::cout << " Endcap: "    << saveEndcaps[j]
+
+		if (verbose_) {
+			std::cout << " Endcap: "    << saveEndcaps[j]
 			  << " Station: "   << saveStations[j]
 			  << " Ring: " 	    << saveRings[j]
 			  << " CSCID: "     << saveCscId[j]
@@ -411,6 +414,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                           << " GlobalEta: " << saveGblEta[j]
 			  << " GlobalZ: "   << saveGblZ[j]
                           << std::endl;
+		}
 
                 ev.lct_gblphi[ev.nlcts] = saveGblPhi[j];
                 ev.lct_gbleta[ev.nlcts] = saveGblEta[j];

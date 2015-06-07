@@ -38,12 +38,41 @@ process.source = cms.Source("PoolSource",
 	#'/store/data/Commissioning2015/Cosmics/RAW/v1/000/237/956/00000/08699835-F6CA-E411-B762-02163E011801.root',
 	#'/store/data/Commissioning2015/Cosmics/RAW/v1/000/237/956/00000/0A19AAF0-EFCA-E411-AF04-02163E012379.root',
 
-	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/926/00000/6A496D1A-F709-E511-B2B9-02163E0145D2.root',
+	#'/store/data/Run2015A/Commissioning/RAW/v1/000/246/923/00000/0E4F1045-070A-E511-BEBE-02163E011ABC.root',
+	#'/store/data/Run2015A/Commissioning/RAW/v1/000/246/923/00000/0EDA384D-EC09-E511-95CE-02163E0143E9.root',
+	#'/store/data/Run2015A/Commissioning/RAW/v1/000/246/923/00000/7C9D5DEF-070A-E511-AEC9-02163E012925.root',
+	#'/store/data/Run2015A/Commissioning/RAW/v1/000/246/923/00000/A66CD04C-070A-E511-A37A-02163E011ACE.root',
+	#'/store/data/Run2015A/Commissioning/RAW/v1/000/246/923/00000/BAA28E49-070A-E511-93A4-02163E0142B3.root',
+
+	#'/store/data/Run2015A/Commissioning/RAW/v1/000/246/926/00000/6A496D1A-F709-E511-B2B9-02163E0145D2.root',
+	#'/store/data/Run2015A/Commissioning/RAW/v1/000/246/926/00000/C44F8E28-F909-E511-940D-02163E014295.root',
+
+	#'/store/data/Run2015A/Commissioning/RAW/v1/000/246/930/00000/0C3D5BEF-F809-E511-83F9-02163E01462A.root',
+	#'/store/data/Run2015A/Commissioning/RAW/v1/000/246/930/00000/6AA54584-F909-E511-8DEF-02163E011DE4.root',
+
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/DA999EA5-5B0A-E511-A03E-02163E0145FF.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/DCB89DA3-5B0A-E511-8A63-02163E014192.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/DCF64CA7-5B0A-E511-8B0E-02163E0141F1.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/E4BCCC1C-660A-E511-BEBD-02163E011B7C.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/E63ADDA5-5B0A-E511-8059-02163E014649.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/EA3BD4A4-5B0A-E511-B256-02163E011A81.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/EAF602E1-800A-E511-A457-02163E0137FE.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/EC43DFA8-5B0A-E511-ACBD-02163E0119DC.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/ECAE73A4-5B0A-E511-9487-02163E0141D2.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/ECE490A6-5B0A-E511-97FE-02163E0138BC.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/EED08BA4-5B0A-E511-8304-02163E0146EE.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/EEF4FF1F-660A-E511-9162-02163E012BAA.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/F26B03DC-530A-E511-A2CC-02163E011D8F.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/F6AD2709-5D0A-E511-A268-02163E014281.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/F6E7A2A5-5B0A-E511-A109-02163E01427A.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/FAE8B7A4-5B0A-E511-AFAA-02163E013775.root',
+	'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/FC19C2AD-5B0A-E511-B4D3-02163E0139DE.root',
+
     )
 )
 
 process.TFileService = cms.Service("TFileService",
-                                   fileName = cms.string("csctf_Run246926.root")
+                                   fileName = cms.string("csctf_Run246963.root")
                                   )
 
 
