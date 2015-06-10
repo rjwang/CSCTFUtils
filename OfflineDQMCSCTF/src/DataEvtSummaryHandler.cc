@@ -22,6 +22,8 @@ bool DataEvtSummaryHandler::initTree(TTree *t)
     t_->Branch("lct_m_station",         evSummary_.lct_m_station,           "lct_m_station[nlcts_m]/I");
     t_->Branch("lct_m_ring",         evSummary_.lct_m_ring,           "lct_m_ring[nlcts_m]/I");
     t_->Branch("lct_m_endcap",         evSummary_.lct_m_endcap,           "lct_m_endcap[nlcts_m]/I");
+    t_->Branch("lct_m_sector",         evSummary_.lct_m_sector,           "lct_m_sector[nlcts_m]/I");
+    t_->Branch("lct_m_bptx",         evSummary_.lct_m_bptx,           "lct_m_bptx[nlcts_m]/I");
 
     t_->Branch("nlcts_p",       &evSummary_.nlcts_p,   "nlcts_p/I");
     t_->Branch("lct_p_gblphi",         evSummary_.lct_p_gblphi,           "lct_p_gblphi[nlcts_p]/F");
@@ -30,6 +32,9 @@ bool DataEvtSummaryHandler::initTree(TTree *t)
     t_->Branch("lct_p_station",         evSummary_.lct_p_station,           "lct_p_station[nlcts_p]/I");
     t_->Branch("lct_p_ring",         evSummary_.lct_p_ring,           "lct_p_ring[nlcts_p]/I");
     t_->Branch("lct_p_endcap",         evSummary_.lct_p_endcap,           "lct_p_endcap[nlcts_p]/I");
+    t_->Branch("lct_p_sector",         evSummary_.lct_p_sector,           "lct_p_sector[nlcts_p]/I");
+    t_->Branch("lct_p_bptx",         evSummary_.lct_p_bptx,           "lct_p_bptx[nlcts_p]/I");
+
 
 
 
@@ -54,6 +59,10 @@ bool DataEvtSummaryHandler::attachToTree(TTree *t)
     t_->SetBranchAddress("lct_m_station",           evSummary_.lct_m_station);
     t_->SetBranchAddress("lct_m_ring",           evSummary_.lct_m_ring);
     t_->SetBranchAddress("lct_m_endcap",           evSummary_.lct_m_endcap);
+    t_->SetBranchAddress("lct_m_sector",           evSummary_.lct_m_sector);
+    t_->SetBranchAddress("lct_m_bptx",           evSummary_.lct_m_bptx);
+
+
 
     t_->SetBranchAddress("nlcts_p",       &evSummary_.nlcts_p);
     t_->SetBranchAddress("lct_p_gblphi",           evSummary_.lct_p_gblphi);
@@ -62,6 +71,10 @@ bool DataEvtSummaryHandler::attachToTree(TTree *t)
     t_->SetBranchAddress("lct_p_station",           evSummary_.lct_p_station);
     t_->SetBranchAddress("lct_p_ring",           evSummary_.lct_p_ring);
     t_->SetBranchAddress("lct_p_endcap",           evSummary_.lct_p_endcap);
+    t_->SetBranchAddress("lct_p_sector",           evSummary_.lct_p_sector);
+    t_->SetBranchAddress("lct_p_bptx",           evSummary_.lct_p_bptx);
+
+
 
 
 

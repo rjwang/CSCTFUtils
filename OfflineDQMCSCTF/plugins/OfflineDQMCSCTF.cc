@@ -87,7 +87,8 @@ private:
 
     bool gangedME1a_;
     bool verbose_;
-    CSCSectorReceiverLUT *srLUTs_[5];
+    //CSCSectorReceiverLUT *srLUTs_[5];
+    CSCSectorReceiverLUT* srLUTs_[5][2];
 
 
     DataEvtSummaryHandler summaryHandler_;
@@ -127,23 +128,59 @@ OfflineDQMCSCTF::OfflineDQMCSCTF(const edm::ParameterSet& iConfig) :
     summaryHandler_.initTree(  fs->make<TTree>("data","Event Summary") );
     TFileDirectory baseDir=fs->mkdir(iConfig.getParameter<std::string>("dtag"));
 
+    /*
+        // instantiate standard on-fly SR LUTs from CSC TF emulator package
+        bzero(srLUTs_,sizeof(srLUTs_));
+        int endcap=1, sector=1; // assume SR LUTs are all same for every sector in either of endcaps
+        bool TMB07=true; // specific TMB firmware
+        // Create a dummy pset for SR LUTs
+        edm::ParameterSet srLUTset;
+        srLUTset.addUntrackedParameter<bool>("ReadLUTs", false);
+        srLUTset.addUntrackedParameter<bool>("Binary",   false);
+        srLUTset.addUntrackedParameter<std::string>("LUTPath", "./");
+        for(int station=1,fpga=0; station<=4 && fpga<5; station++) {
+            if(station==1)
+                for(int subSector=0; subSector<2 && fpga<5; subSector++)
+                    srLUTs_[fpga++] = new CSCSectorReceiverLUT(endcap, sector, subSector+1, station, srLUTset, TMB07);
+            else
+                srLUTs_[fpga++] = new CSCSectorReceiverLUT(endcap, sector, 0, station, srLUTset, TMB07);
+        }
+    */
 
-    // instantiate standard on-fly SR LUTs from CSC TF emulator package
-    bzero(srLUTs_,sizeof(srLUTs_));
-    int endcap=1, sector=1; // assume SR LUTs are all same for every sector in either of endcaps
+    bzero(srLUTs_ , sizeof(srLUTs_));
+    int sector=1;    // assume SR LUTs are all same for every sector
     bool TMB07=true; // specific TMB firmware
-    // Create a dummy pset for SR LUTs
+    // Create a pset for SR/PT LUTs: if you do not change the value in the
+    // configuration file, it will load the default minitLUTs
     edm::ParameterSet srLUTset;
     srLUTset.addUntrackedParameter<bool>("ReadLUTs", false);
     srLUTset.addUntrackedParameter<bool>("Binary",   false);
     srLUTset.addUntrackedParameter<std::string>("LUTPath", "./");
+
+    // positive endcap
+    int endcap = 1;
     for(int station=1,fpga=0; station<=4 && fpga<5; station++) {
         if(station==1)
             for(int subSector=0; subSector<2 && fpga<5; subSector++)
-                srLUTs_[fpga++] = new CSCSectorReceiverLUT(endcap, sector, subSector+1, station, srLUTset, TMB07);
+                srLUTs_[fpga++][1] = new CSCSectorReceiverLUT(endcap,sector,subSector+1,
+                        station, srLUTset, TMB07);
         else
-            srLUTs_[fpga++] = new CSCSectorReceiverLUT(endcap, sector, 0, station, srLUTset, TMB07);
+            srLUTs_[fpga++][1]   = new CSCSectorReceiverLUT(endcap,  sector,   0,
+                    station, srLUTset, TMB07);
     }
+
+    // negative endcap
+    endcap = 2;
+    for(int station=1,fpga=0; station<=4 && fpga<5; station++) {
+        if(station==1)
+            for(int subSector=0; subSector<2 && fpga<5; subSector++)
+                srLUTs_[fpga++][0] = new CSCSectorReceiverLUT(endcap,sector,subSector+1,
+                        station, srLUTset, TMB07);
+        else
+            srLUTs_[fpga++][0]   = new CSCSectorReceiverLUT(endcap,  sector,   0,
+                    station, srLUTset, TMB07);
+    }
+
 
 
     gangedME1a_ = iConfig.getUntrackedParameter<bool>("gangedME1a", false);
@@ -156,8 +193,14 @@ OfflineDQMCSCTF::~OfflineDQMCSCTF()
 
     // do anything here that needs to be done at desctruction time
     // (e.g. close files, deallocate resources etc.)
-    for(int i=0; i<5; i++)
-        delete srLUTs_[i]; //free the array of pointers
+    //for(int i=0; i<5; i++)
+    //    delete srLUTs_[i]; //free the array of pointers
+
+
+  //free the CSCTF array of pointers
+  for(unsigned int j=0; j<2; j++)
+    for(unsigned int i=0; i<5; i++)
+     delete srLUTs_[i][j];
 
 }
 
@@ -196,6 +239,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     std::vector<double> saveGblPhi_m;
     std::vector<double> saveGblEta_m;
     std::vector<double> saveGblZ_m;
+    std::vector<int> saveBPTX_m;
 
     std::vector<int> saveEndcaps_p;
     std::vector<int> saveStations_p;
@@ -205,6 +249,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     std::vector<double> saveGblPhi_p;
     std::vector<double> saveGblEta_p;
     std::vector<double> saveGblZ_p;
+    std::vector<int> saveBPTX_p;
 
 
     for(CSCCorrelatedLCTDigiCollection::DigiRangeIterator csc=corrlcts.product()->begin(); csc!=corrlcts.product()->end(); csc++) {
@@ -222,33 +267,33 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
             int bx        = lct -> getBX();
             int quality   = lct -> getQuality();
             int bend      = lct -> getBend();
-/*
-            //int endcapAssignment = 1;
-            int shift = 1;
-            float sectorArg = sector;
-            //float sectorArg = j;
+            /*
+                        //int endcapAssignment = 1;
+                        int shift = 1;
+                        float sectorArg = sector;
+                        //float sectorArg = j;
 
-            if( endcap == 1 ) {
-                endcapAssignment = -1;
-                shift = 2;
-                //sectorArg = sector - 6;
-            }
+                        if( endcap == 1 ) {
+                            endcapAssignment = -1;
+                            shift = 2;
+                            //sectorArg = sector - 6;
+                        }
 
-            //int signedStation = (station + shift)* endcapAssignment;
-            //if( (station == 0) && (endcap == 0)) signedStation = subSector - 1;
-            //if( (station == 0) && (endcap == 1)) signedStation = (-1)*subSector;
+                        //int signedStation = (station + shift)* endcapAssignment;
+                        //if( (station == 0) && (endcap == 0)) signedStation = subSector - 1;
+                        //if( (station == 0) && (endcap == 1)) signedStation = (-1)*subSector;
 
-            float chamberArg1 = cscId * 0.1 + sectorArg;
-            //float chamberArg1 = i*0.1 + sectorArg;
-            //std::cout << "First" << i << " " << sectorArg << " " << chamberArg1 << std::endl;
+                        float chamberArg1 = cscId * 0.1 + sectorArg;
+                        //float chamberArg1 = i*0.1 + sectorArg;
+                        //std::cout << "First" << i << " " << sectorArg << " " << chamberArg1 << std::endl;
 
-            float chamberArg11 = chamberArg1;
-            if(sectorArg == 1) chamberArg1 = chamberArg11 - 0.1;
-            if(sectorArg == 2) chamberArg1 = chamberArg11 - 0.2;
-            if(sectorArg == 3) chamberArg1 = chamberArg11 - 0.3;
-            if(sectorArg == 4) chamberArg1 = chamberArg11 - 0.4;
-            if(sectorArg == 5) chamberArg1 = chamberArg11 - 0.5;
-*/
+                        float chamberArg11 = chamberArg1;
+                        if(sectorArg == 1) chamberArg1 = chamberArg11 - 0.1;
+                        if(sectorArg == 2) chamberArg1 = chamberArg11 - 0.2;
+                        if(sectorArg == 3) chamberArg1 = chamberArg11 - 0.3;
+                        if(sectorArg == 4) chamberArg1 = chamberArg11 - 0.4;
+                        if(sectorArg == 5) chamberArg1 = chamberArg11 - 0.5;
+            */
             //if(verbose_) std::cout << "cscId, station, sector, endcap, sectorArg, chamber Arg: " << cscId << ", " << station << ", " <<sector << ", " << endcap << ", " << chamberArg1 << ", " << signedStation << std::endl;
 
             //csctfChamberOccupancies->Fill(chamberArg1, signedStation);
@@ -274,26 +319,28 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
 
 
-
+	    int EndCapLUT;
+ 	    if(endcap==0) EndCapLUT=1; // plus
+	    if(endcap==1) EndCapLUT=0; // minus
 
 
             lclphidat lclPhi;
             try {
-                lclPhi = srLUTs_[fpga]->localPhi(lct->getStrip(), lct->getPattern(), lct->getQuality(), lct->getBend(), gangedME1a_);
+                lclPhi = srLUTs_[fpga][EndCapLUT]->localPhi(lct->getStrip(), lct->getPattern(), lct->getQuality(), lct->getBend(), gangedME1a_);
             } catch(cms::Exception &) {
                 bzero(&lclPhi,sizeof(lclPhi));
             }
 
             gblphidat gblPhi;
             try {
-                gblPhi = srLUTs_[fpga]->globalPhiME(lclPhi.phi_local, lct->getKeyWG(), cscId+1, gangedME1a_);
+                gblPhi = srLUTs_[fpga][EndCapLUT]->globalPhiME(lclPhi.phi_local, lct->getKeyWG(), cscId+1, gangedME1a_);
             } catch(cms::Exception &) {
                 bzero(&gblPhi,sizeof(gblPhi));
             }
 
             gbletadat gblEta;
             try {
-                gblEta = srLUTs_[fpga]->globalEtaME(lclPhi.phi_bend_local, lclPhi.phi_local, lct->getKeyWG(), cscId+1, gangedME1a_);
+                gblEta = srLUTs_[fpga][EndCapLUT]->globalEtaME(lclPhi.phi_bend_local, lclPhi.phi_local, lct->getKeyWG(), cscId+1, gangedME1a_);
             } catch(cms::Exception &) {
                 bzero(&gblEta,sizeof(gblEta));
             }
@@ -327,7 +374,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
 
 
-	    bool showdetails(false);
+            bool showdetails(false);
             if (verbose_ && showdetails) {
                 cout << "\n ===== Current LCT Values ====== \n";
                 cout << " Endcap    = " << endcap           << endl;
@@ -357,28 +404,29 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
             CSCDetId _cscid_(endcap+1, station+1, ring, sector+1);
             double globalZ(0);
             globalZ = cscGeometry->idToDet(_cscid_)->position().z();
-	    if(globalZ<0) etaG *= -1;
+            if(globalZ<0) etaG *= -1;
 
-	    if(endcap==0) {
-            	saveEndcaps_p.push_back(endcap);
-            	saveStations_p.push_back(station);
-            	saveRings_p.push_back(ring);
-            	saveGblPhi_p.push_back(phiG);
-            	saveGblEta_p.push_back(etaG);
-            	saveGblZ_p.push_back(globalZ);
-	    	saveCscId_p.push_back(cscId);
-	    	saveSector_p.push_back(sector);
-	    }
-	    else if(endcap==1) {
-            	saveEndcaps_m.push_back(endcap);
-            	saveStations_m.push_back(station);
-            	saveRings_m.push_back(ring);
-            	saveGblPhi_m.push_back(phiG);
-            	saveGblEta_m.push_back(etaG);
-            	saveGblZ_m.push_back(globalZ);
-	    	saveCscId_m.push_back(cscId);
-	    	saveSector_m.push_back(sector);
-	    }
+            if(endcap==0) {
+                saveEndcaps_p.push_back(endcap);
+                saveStations_p.push_back(station);
+                saveRings_p.push_back(ring);
+                saveGblPhi_p.push_back(phiG);
+                saveGblEta_p.push_back(etaG);
+                saveGblZ_p.push_back(globalZ);
+                saveCscId_p.push_back(cscId);
+                saveSector_p.push_back(sector);
+                saveBPTX_p.push_back(bx);
+            } else if(endcap==1) {
+                saveEndcaps_m.push_back(endcap);
+                saveStations_m.push_back(station);
+                saveRings_m.push_back(ring);
+                saveGblPhi_m.push_back(phiG);
+                saveGblEta_m.push_back(etaG);
+                saveGblZ_m.push_back(globalZ);
+                saveCscId_m.push_back(cscId);
+                saveSector_m.push_back(sector);
+                saveBPTX_m.push_back(bx);
+            }
 
 
 
@@ -400,27 +448,29 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
         if(hasSameSector_m) {
 
-	    if (verbose_) std::cout << "\n ======= LUT Resolution ======= " << std::endl;
+            if (verbose_) std::cout << "\n ======= LUT Resolution ======= " << std::endl;
             for(size_t j=0; j<saveGblPhi_m.size(); j++) {
 
-		if (verbose_) {
-			std::cout << " Endcap: "    << saveEndcaps_m[j]
-			  << " Station: "   << saveStations_m[j]
-			  << " Ring: " 	    << saveRings_m[j]
-			  << " CSCID: "     << saveCscId_m[j]
-			  << " Sector: "    << saveSector_m[j]
-                	  << " GlobalPhi: " << saveGblPhi_m[j]
-                          << " GlobalEta: " << saveGblEta_m[j]
-			  << " GlobalZ: "   << saveGblZ_m[j]
-                          << std::endl;
-		}
+                if (verbose_) {
+                    std::cout << " Endcap: "    << saveEndcaps_m[j]
+                              << " Station: "   << saveStations_m[j]
+                              << " Ring: " 	    << saveRings_m[j]
+                              << " CSCID: "     << saveCscId_m[j]
+                              << " Sector: "    << saveSector_m[j]
+                              << " GlobalPhi: " << saveGblPhi_m[j]
+                              << " GlobalEta: " << saveGblEta_m[j]
+                              << " GlobalZ: "   << saveGblZ_m[j]
+                              << std::endl;
+                }
 
                 ev.lct_m_gblphi[ev.nlcts_m] = saveGblPhi_m[j];
                 ev.lct_m_gbleta[ev.nlcts_m] = saveGblEta_m[j];
-		ev.lct_m_gblZ[ev.nlcts_m] = saveGblZ_m[j];
+                ev.lct_m_gblZ[ev.nlcts_m] = saveGblZ_m[j];
                 ev.lct_m_endcap[ev.nlcts_m] = saveEndcaps_m[j];
                 ev.lct_m_station[ev.nlcts_m]= saveStations_m[j];
                 ev.lct_m_ring[ev.nlcts_m]   = saveRings_m[j];
+                ev.lct_m_sector[ev.nlcts_m] = saveSector_m[j];
+                ev.lct_m_bptx[ev.nlcts_m] = saveBPTX_m[j];
 
                 ev.nlcts_m++;
             }
@@ -440,27 +490,29 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
         if(hasSameSector_p) {
 
-	    if (verbose_) std::cout << "\n ======= LUT Resolution ======= " << std::endl;
+            if (verbose_) std::cout << "\n ======= LUT Resolution ======= " << std::endl;
             for(size_t j=0; j<saveGblPhi_p.size(); j++) {
 
-		if (verbose_) {
-			std::cout << " Endcap: "    << saveEndcaps_p[j]
-			  << " Station: "   << saveStations_p[j]
-			  << " Ring: " 	    << saveRings_p[j]
-			  << " CSCID: "     << saveCscId_p[j]
-			  << " Sector: "    << saveSector_p[j]
-                	  << " GlobalPhi: " << saveGblPhi_p[j]
-                          << " GlobalEta: " << saveGblEta_p[j]
-			  << " GlobalZ: "   << saveGblZ_p[j]
-                          << std::endl;
-		}
+                if (verbose_) {
+                    std::cout << " Endcap: "    << saveEndcaps_p[j]
+                              << " Station: "   << saveStations_p[j]
+                              << " Ring: " 	    << saveRings_p[j]
+                              << " CSCID: "     << saveCscId_p[j]
+                              << " Sector: "    << saveSector_p[j]
+                              << " GlobalPhi: " << saveGblPhi_p[j]
+                              << " GlobalEta: " << saveGblEta_p[j]
+                              << " GlobalZ: "   << saveGblZ_p[j]
+                              << std::endl;
+                }
 
                 ev.lct_p_gblphi[ev.nlcts_p] = saveGblPhi_p[j];
                 ev.lct_p_gbleta[ev.nlcts_p] = saveGblEta_p[j];
-		ev.lct_p_gblZ[ev.nlcts_p] = saveGblZ_p[j];
+                ev.lct_p_gblZ[ev.nlcts_p] = saveGblZ_p[j];
                 ev.lct_p_endcap[ev.nlcts_p] = saveEndcaps_p[j];
                 ev.lct_p_station[ev.nlcts_p]= saveStations_p[j];
                 ev.lct_p_ring[ev.nlcts_p]   = saveRings_p[j];
+                ev.lct_p_sector[ev.nlcts_p] = saveSector_p[j];
+                ev.lct_p_bptx[ev.nlcts_p] = saveBPTX_p[j];
 
                 ev.nlcts_p++;
             }

@@ -17,6 +17,8 @@ void plotter()
     All1Dhists.push_back("h_deltaEta");
 
     All1Dhists.push_back("h_deltaPhiMEp11");
+    All1Dhists.push_back("h_deltaPhiMEp11a");
+    All1Dhists.push_back("h_deltaPhiMEp11b");
     All1Dhists.push_back("h_deltaPhiMEp12");
     All1Dhists.push_back("h_deltaPhiMEp13");
     All1Dhists.push_back("h_deltaPhiMEp21");
@@ -28,6 +30,8 @@ void plotter()
 
 
     All1Dhists.push_back("h_deltaPhiMEm11");
+    All1Dhists.push_back("h_deltaPhiMEm11a");
+    All1Dhists.push_back("h_deltaPhiMEm11b");
     All1Dhists.push_back("h_deltaPhiMEm12");
     All1Dhists.push_back("h_deltaPhiMEm13");
     All1Dhists.push_back("h_deltaPhiMEm21");
@@ -38,6 +42,8 @@ void plotter()
     All1Dhists.push_back("h_deltaPhiMEm42");
 
     All1Dhists.push_back("h_deltaEtaMEp11");
+    All1Dhists.push_back("h_deltaEtaMEp11a");
+    All1Dhists.push_back("h_deltaEtaMEp11b");
     All1Dhists.push_back("h_deltaEtaMEp12");
     All1Dhists.push_back("h_deltaEtaMEp13");
     All1Dhists.push_back("h_deltaEtaMEp21");
@@ -49,6 +55,8 @@ void plotter()
 
 
     All1Dhists.push_back("h_deltaEtaMEm11");
+    All1Dhists.push_back("h_deltaEtaMEm11a");
+    All1Dhists.push_back("h_deltaEtaMEm11b");
     All1Dhists.push_back("h_deltaEtaMEm12");
     All1Dhists.push_back("h_deltaEtaMEm13");
     All1Dhists.push_back("h_deltaEtaMEm21");
@@ -70,6 +78,47 @@ void plotter()
     All1Dhists.push_back("h_p_p3");
     All1Dhists.push_back("h_p_distance");
 
+
+
+    All1Dhists.push_back("h_deltaPhiMEpSec0");
+    All1Dhists.push_back("h_deltaPhiMEpSec1");
+    All1Dhists.push_back("h_deltaPhiMEpSec2");
+    All1Dhists.push_back("h_deltaPhiMEpSec3");
+    All1Dhists.push_back("h_deltaPhiMEpSec4");
+    All1Dhists.push_back("h_deltaPhiMEpSec5");
+
+    All1Dhists.push_back("h_deltaPhiMEmSec0");
+    All1Dhists.push_back("h_deltaPhiMEmSec1");
+    All1Dhists.push_back("h_deltaPhiMEmSec2");
+    All1Dhists.push_back("h_deltaPhiMEmSec3");
+    All1Dhists.push_back("h_deltaPhiMEmSec4");
+    All1Dhists.push_back("h_deltaPhiMEmSec5");
+
+    All1Dhists.push_back("h_deltaEtaMEpSec0");
+    All1Dhists.push_back("h_deltaEtaMEpSec1");
+    All1Dhists.push_back("h_deltaEtaMEpSec2");
+    All1Dhists.push_back("h_deltaEtaMEpSec3");
+    All1Dhists.push_back("h_deltaEtaMEpSec4");
+    All1Dhists.push_back("h_deltaEtaMEpSec5");
+
+    All1Dhists.push_back("h_deltaEtaMEmSec0");
+    All1Dhists.push_back("h_deltaEtaMEmSec1");
+    All1Dhists.push_back("h_deltaEtaMEmSec2");
+    All1Dhists.push_back("h_deltaEtaMEmSec3");
+    All1Dhists.push_back("h_deltaEtaMEmSec4");
+    All1Dhists.push_back("h_deltaEtaMEmSec5");
+
+    All1Dhists.push_back("h_p_dr0");
+    All1Dhists.push_back("h_m_dr0");
+
+
+
+
+    vector<TString> All2Dhists;
+    All2Dhists.push_back("h_deltaEtavsPhi_MEp");
+    All2Dhists.push_back("h_deltaEtavsPhi_MEm");
+    All2Dhists.push_back("h_deltaPhivsEta_MEp");
+    All2Dhists.push_back("h_deltaPhivsEta_MEm");
 
 
 
@@ -106,10 +155,25 @@ void plotter()
                 t1->SetRightMargin(0.05);
 		t1->SetLogy(1);
                 //c->Divide(1,2);
-                hist_2->Draw("hist");
+
+
+                hist_2->Draw("");
+
+		if(All1Dhists[ihist].Contains("Eta")|| All1Dhists[ihist].Contains("Phi")){
+			hist_2->Fit("gaus","+","",-0.5,0.5);
+		}
+
+
+		if(hist_2->GetFunction("gaus"))
+			hist_2->GetFunction("gaus")->SetLineWidth(2);
+
                 //hx_->GetXaxis()->SetTitle("Vertices");
                 hist_2->GetYaxis()->SetTitle("Events");
 		hist_2->SetFillColor(kYellow);
+		if(All1Dhists[ihist].Contains("MEp") || All1Dhists[ihist].Contains("_p_")) hist_2->SetFillColor(kGreen-7);
+		if(All1Dhists[ihist].Contains("MEm") || All1Dhists[ihist].Contains("_m_")) hist_2->SetFillColor(kOrange-3);
+
+		c->Update();
 
 		c->SaveAs(All1Dhists[ihist]+".png");
                 c->SaveAs(All1Dhists[ihist]+".pdf");
@@ -120,6 +184,32 @@ void plotter()
 
 
 
+    for(size_t ihist=0; ihist<All2Dhists.size(); ihist++) {
+
+                TH2F* hist_temp = (TH2F*) infile->Get(All2Dhists[ihist]);
+                if(hist_temp==NULL) {
+                    cout << "hist is NULL!" << endl;
+                    continue;
+                }
+
+                TCanvas *c = new TCanvas("c", "c", 700, 550);
+                TPad* t1 = new TPad("t1","t1", 0.0, 0.0, 1.0, 1.00);
+                t1->Draw();
+                t1->cd();
+                //t1->SetBottomMargin(0.3);
+                t1->SetRightMargin(0.23);
+                //c->Divide(1,2);
+                hist_temp->Draw("col Z");
+                //hx_->GetXaxis()->SetTitle("Vertices");
+                //hx_->GetYaxis()->SetTitle("<E_{Y}^{miss}>");
+
+                c->SaveAs(All2Dhists[ihist]+".png");
+                c->SaveAs(All2Dhists[ihist]+".pdf");
+
+                delete c;
+                delete hist_temp;
+
+    }
 
 
     infile->Close();
