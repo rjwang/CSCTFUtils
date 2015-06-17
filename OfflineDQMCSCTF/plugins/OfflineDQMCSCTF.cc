@@ -128,24 +128,6 @@ OfflineDQMCSCTF::OfflineDQMCSCTF(const edm::ParameterSet& iConfig) :
     summaryHandler_.initTree(  fs->make<TTree>("data","Event Summary") );
     TFileDirectory baseDir=fs->mkdir(iConfig.getParameter<std::string>("dtag"));
 
-    /*
-        // instantiate standard on-fly SR LUTs from CSC TF emulator package
-        bzero(srLUTs_,sizeof(srLUTs_));
-        int endcap=1, sector=1; // assume SR LUTs are all same for every sector in either of endcaps
-        bool TMB07=true; // specific TMB firmware
-        // Create a dummy pset for SR LUTs
-        edm::ParameterSet srLUTset;
-        srLUTset.addUntrackedParameter<bool>("ReadLUTs", false);
-        srLUTset.addUntrackedParameter<bool>("Binary",   false);
-        srLUTset.addUntrackedParameter<std::string>("LUTPath", "./");
-        for(int station=1,fpga=0; station<=4 && fpga<5; station++) {
-            if(station==1)
-                for(int subSector=0; subSector<2 && fpga<5; subSector++)
-                    srLUTs_[fpga++] = new CSCSectorReceiverLUT(endcap, sector, subSector+1, station, srLUTset, TMB07);
-            else
-                srLUTs_[fpga++] = new CSCSectorReceiverLUT(endcap, sector, 0, station, srLUTset, TMB07);
-        }
-    */
 
     bzero(srLUTs_ , sizeof(srLUTs_));
     int sector=1;    // assume SR LUTs are all same for every sector
@@ -193,14 +175,10 @@ OfflineDQMCSCTF::~OfflineDQMCSCTF()
 
     // do anything here that needs to be done at desctruction time
     // (e.g. close files, deallocate resources etc.)
-    //for(int i=0; i<5; i++)
-    //    delete srLUTs_[i]; //free the array of pointers
-
-
-  //free the CSCTF array of pointers
-  for(unsigned int j=0; j<2; j++)
-    for(unsigned int i=0; i<5; i++)
-     delete srLUTs_[i][j];
+    //free the CSCTF array of pointers
+    for(unsigned int j=0; j<2; j++)
+        for(unsigned int i=0; i<5; i++)
+            delete srLUTs_[i][j];
 
 }
 
@@ -319,9 +297,9 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
 
 
-	    int EndCapLUT;
- 	    if(endcap==0) EndCapLUT=1; // plus
-	    if(endcap==1) EndCapLUT=0; // minus
+            int EndCapLUT=-1;
+            if(endcap==0) EndCapLUT=1; // plus
+            if(endcap==1) EndCapLUT=0; // minus
 
 
             lclphidat lclPhi;

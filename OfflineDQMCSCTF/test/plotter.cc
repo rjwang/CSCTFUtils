@@ -121,6 +121,66 @@ void plotter()
     All2Dhists.push_back("h_deltaPhivsEta_MEm");
 
 
+    All2Dhists.push_back("h_dPhivs10degPhi_MEp");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEm");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEp");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEm");
+
+
+    All2Dhists.push_back("h_dEtavs10degPhi_MEp11");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEp11a");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEp11b");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEp12");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEp13");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEp21");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEp22");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEp31");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEp32");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEp41");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEp42");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEm11");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEm11a");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEm11b");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEm12");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEm13");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEm21");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEm22");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEm31");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEm32");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEm41");
+    All2Dhists.push_back("h_dEtavs10degPhi_MEm42");
+
+
+    All2Dhists.push_back("h_dPhivs10degPhi_MEp11");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEp11a");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEp11b");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEp12");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEp13");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEp21");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEp22");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEp31");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEp32");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEp41");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEp42");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEm11");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEm11a");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEm11b");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEm12");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEm13");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEm21");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEm22");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEm31");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEm32");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEm41");
+    All2Dhists.push_back("h_dPhivs10degPhi_MEm42");
+
+
+
+
+
+
+
+
 
 
 
@@ -147,12 +207,13 @@ void plotter()
                     continue;
                 }
 
-                TCanvas *c = new TCanvas("c", "c", 700, 550);
+                //TCanvas *c = new TCanvas("c", "c", 700, 550);
+		TCanvas *c = new TCanvas("c", "c", 900, 550);
                 TPad* t1 = new TPad("t1","t1", 0.0, 0.0, 1.0, 1.00);
                 t1->Draw();
                 t1->cd();
                 //t1->SetBottomMargin(0.3);
-                t1->SetRightMargin(0.05);
+                t1->SetRightMargin(0.25);
 		t1->SetLogy(1);
                 //c->Divide(1,2);
 

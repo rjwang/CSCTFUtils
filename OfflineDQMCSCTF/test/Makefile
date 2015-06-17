@@ -8,8 +8,9 @@ test:
 fit:
 	@#root -l -b -q readLCTAnalyzer.cc'("Data13TeV_Run2015A_RAW.root","output_test.root")'++ > /tmp/rewang/output_lct.log
 	@#root -l -b -q readLCTAnalyzer.cc'("Data13TeV_Run2015A_SingleMu.root","output_test.root")'++ > /tmp/rewang/output_lct.log
-#	@root -l -b -q readLCTAnalyzer.cc'("/tmp/rewang/csctf_Run246963_ME-11_match_ME+11.root","output_test.root")'++ > /tmp/rewang/output_lct.log
-	@root -l -b -q readLCTAnalyzer.cc'("/tmp/rewang/csctf_Run246963_nochange.root","output_test.root")'++ > /tmp/rewang/output_lct.log
+	@root -l -b -q readLCTAnalyzer.cc'("Data13TeV_Run2015A_SingleMu_testLUT.root","output_test.root")'++ > /tmp/rewang/output_lct.log
+	@#root -l -b -q readLCTAnalyzer.cc'("/tmp/rewang/csctf_Run246963_ME-11_match_ME+11.root","output_test.root")'++ > /tmp/rewang/output_lct.log
+	@#root -l -b -q readLCTAnalyzer.cc'("/tmp/rewang/csctf_Run246963_nochange.root","output_test.root")'++ > /tmp/rewang/output_lct.log
 
 
 
