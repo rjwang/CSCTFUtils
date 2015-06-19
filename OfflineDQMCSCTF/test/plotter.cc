@@ -223,7 +223,7 @@ void plotter(TString Input="output_test.root")
                 hist_2->Draw("");
 
 		if(All1Dhists[ihist].Contains("Eta")|| All1Dhists[ihist].Contains("Phi")){
-			hist_2->Fit("gaus","+","",-0.5,0.5);
+			hist_2->Fit("gaus","+","",-0.1,0.1);
 		}
 
 

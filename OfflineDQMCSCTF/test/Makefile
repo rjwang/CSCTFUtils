@@ -16,8 +16,8 @@ fit:
 	@root -l -b -q readLCTAnalyzer.cc'("raw_test.root","output_test.root")'++ > /tmp/rewang/output_lct.log &
 
 plot:
-	@#hadd -f output_test.root output_test_*.root
-	@root -l -b -q plotter.cc'("output_swapstrpsOfCFEB1and4_ME11b.root")'
+	@hadd -f output_test.root output_test_*.root
+	@root -l -b -q plotter.cc'("output_test.root")'
 	@rm ~/www/my_public/CSCTF_LUTRel/*.png
 	@rm ~/www/my_public/CSCTF_LUTRel/*.pdf
 	@mv *.png ~/www/my_public/CSCTF_LUTRel/

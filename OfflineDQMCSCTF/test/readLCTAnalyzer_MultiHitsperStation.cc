@@ -264,7 +264,7 @@ dofit(std::vector<double> allphiG, std::vector<double> alletaG, std::vector<doub
     return LUTrels;
 }
 
-void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", TString _output_="output_test.root", int entry0=0)
+void readLCTAnalyzer_MultiHitsperStation(TString _input_="./csctf_Run246926.root", TString _output_="output_test.root",int entry0=0)
 {
 
     TFile *InFile = TFile::Open(_input_, "READ");
@@ -273,7 +273,7 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
     TString outputLOG = _output_;
     outputLOG.ReplaceAll(".root",".log");
     ofstream outfile;
-    outfile.open (outputLOG);
+    outfile.open ("/tmp/rewang/"+outputLOG);
 
 
     Int_t nlcts_m;
@@ -578,7 +578,7 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
             //outfile << "------------------" << endl;
 
 	    bool ifOneHitStat(diffstation.size()==allstation.size());
-	    if(!ifOneHitStat) continue;
+	    //if(!ifOneHitStat) continue;
 	    if(diffstation.size()<2) continue;
 
             //if(allphiG.size()<5) continue;
@@ -612,11 +612,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
 		float dr0 = deltaPhiEtas[j].dr0;
 		float chi2 = deltaPhiEtas[j].chi2;
 
-		//if(chi2>0.1) continue;
-                //if( fabs(p0)>200 || fabs(p1)>200 || fabs(p2)>200 || fabs(p3)>200 || distance>50 || chi2>0.1 || dr0 > 500) continue;
-                if( fabs(p0)>200 || fabs(p1)>200 || fabs(p2)>200 || fabs(p3)>200 || chi2>0.5 ||  dr0 > 500) continue;
-
-
+                //if( fabs(p0)>200 || fabs(p1)>200 || fabs(p2)>200 || fabs(p3)>200 || distance>50) continue;
+		if( chi2>0.05 || dr0>500) continue;
 
 
                 if(iendcap==1) {

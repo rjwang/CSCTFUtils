@@ -199,6 +199,12 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     //event summary to be filled
     DataEvtSummary_t &ev=summaryHandler_.getEvent();
 
+    //event header
+    ev.run    = iEvent.id().run();
+    ev.lumi   = iEvent.luminosityBlock();
+    ev.event  = iEvent.id().event();
+
+
     edm::ESHandle<CSCGeometry> cscGeometry;
     iSetup.get<MuonGeometryRecord>().get(cscGeometry);
 
@@ -219,6 +225,11 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     std::vector<double> saveGblEta_m;
     std::vector<double> saveGblZ_m;
     std::vector<int> saveBPTX_m;
+    std::vector<int> saveStrip_m;
+    std::vector<int> savekeyWire_m;
+    std::vector<double> saveLclPhi_m;
+    std::vector<double> savePkdPhi_m;
+    std::vector<double> savePkdEta_m;
 
     std::vector<int> saveEndcaps_p;
     std::vector<int> saveStations_p;
@@ -230,6 +241,11 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     std::vector<double> saveGblZ_p;
     std::vector<int> saveBPTX_p;
 
+    std::vector<int> saveStrip_p;
+    std::vector<int> savekeyWire_p;
+    std::vector<double> saveLclPhi_p;
+    std::vector<double> savePkdPhi_p;
+    std::vector<double> savePkdEta_p;
 
     for(CSCCorrelatedLCTDigiCollection::DigiRangeIterator csc=corrlcts.product()->begin(); csc!=corrlcts.product()->end(); csc++) {
         CSCCorrelatedLCTDigiCollection::Range range1 = corrlcts.product()->get((*csc).first);
@@ -395,6 +411,11 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 saveCscId_p.push_back(cscId);
                 saveSector_p.push_back(sector);
                 saveBPTX_p.push_back(bx);
+		saveStrip_p.push_back(strip);
+		savekeyWire_p.push_back(keyWire);
+		saveLclPhi_p.push_back(lclPhi.phi_local);
+		savePkdPhi_p.push_back(theStub.phiPacked());
+		savePkdEta_p.push_back(theStub.etaPacked());
             } else if(endcap==1) {
                 saveEndcaps_m.push_back(endcap);
                 saveStations_m.push_back(station);
@@ -405,6 +426,11 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 saveCscId_m.push_back(cscId);
                 saveSector_m.push_back(sector);
                 saveBPTX_m.push_back(bx);
+                saveStrip_m.push_back(strip);
+                savekeyWire_m.push_back(keyWire);
+                saveLclPhi_m.push_back(lclPhi.phi_local);
+                savePkdPhi_m.push_back(theStub.phiPacked());
+                savePkdEta_m.push_back(theStub.etaPacked());
             }
 
 
@@ -452,6 +478,12 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 ev.lct_m_sector[ev.nlcts_m] = saveSector_m[j];
                 ev.lct_m_bptx[ev.nlcts_m]   = saveBPTX_m[j];
 
+                ev.lct_m_strip[ev.nlcts_m]   = saveStrip_m[j];
+                ev.lct_m_keywire[ev.nlcts_m] = savekeyWire_m[j];
+                ev.lct_m_lclphi[ev.nlcts_m]  = saveLclPhi_m[j];
+                ev.lct_m_pkdphi[ev.nlcts_m]  = savePkdPhi_m[j];
+                ev.lct_m_pkdeta[ev.nlcts_m]  = savePkdEta_m[j];
+
                 ev.nlcts_m++;
             }
         }
@@ -494,6 +526,12 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 		ev.lct_p_cscid[ev.nlcts_p]  = saveCscId_p[j];
                 ev.lct_p_sector[ev.nlcts_p] = saveSector_p[j];
                 ev.lct_p_bptx[ev.nlcts_p]   = saveBPTX_p[j];
+
+		ev.lct_p_strip[ev.nlcts_p]   = saveStrip_p[j];
+		ev.lct_p_keywire[ev.nlcts_p] = savekeyWire_p[j];
+		ev.lct_p_lclphi[ev.nlcts_p]  = saveLclPhi_p[j];
+		ev.lct_p_pkdphi[ev.nlcts_p]  = savePkdPhi_p[j];
+		ev.lct_p_pkdeta[ev.nlcts_p]  = savePkdEta_p[j];
 
                 ev.nlcts_p++;
             }
