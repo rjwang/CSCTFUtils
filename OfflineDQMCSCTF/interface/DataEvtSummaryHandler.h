@@ -30,10 +30,12 @@ struct DataEvtSummary_t {
     Int_t nlcts_m;
     Float_t lct_m_gblphi[MAXLUTS], lct_m_gbleta[MAXLUTS], lct_m_gblZ[MAXLUTS];
     Int_t lct_m_station[MAXLUTS], lct_m_ring[MAXLUTS], lct_m_endcap[MAXLUTS], lct_m_sector[MAXLUTS], lct_m_bptx[MAXLUTS];
+    Int_t lct_m_cscid[MAXLUTS];
 
     Int_t nlcts_p;
     Float_t lct_p_gblphi[MAXLUTS], lct_p_gbleta[MAXLUTS], lct_p_gblZ[MAXLUTS];
     Int_t lct_p_station[MAXLUTS], lct_p_ring[MAXLUTS], lct_p_endcap[MAXLUTS], lct_p_sector[MAXLUTS], lct_p_bptx[MAXLUTS];
+    Int_t lct_p_cscid[MAXLUTS];
 
 
 };

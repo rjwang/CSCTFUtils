@@ -264,7 +264,7 @@ dofit(std::vector<double> allphiG, std::vector<double> alletaG, std::vector<doub
     return LUTrels;
 }
 
-void readLCTAnalyzer(TString _input_="./csctf_Run246926.root", TString _output_="output_test.root")
+void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", TString _output_="output_test.root", int entry0=0)
 {
 
     TFile *InFile = TFile::Open(_input_, "READ");
@@ -499,10 +499,13 @@ void readLCTAnalyzer(TString _input_="./csctf_Run246926.root", TString _output_=
     //printf("Progressing Bar     :0%%       20%%       40%%       60%%       80%%       100%%\n");
     //printf("Scanning the ntuple :");
     // all entries and fill the histograms
-    Int_t nentries = (Int_t)t_->GetEntries();
-    //nentries=10000;
+    Int_t totnentries = (Int_t)t_->GetEntries();
+    int nentries=50000;
+    int entry1 = entry0+nentries;
+    if(entry0>totnentries) return;
+    if(entry1>totnentries) entry1=totnentries;
     //int treeStep = nentries/50;
-    for (Int_t i=0; i<nentries; i++) {
+    for (Int_t i=entry0; i<entry1; i++) {
         t_->GetEntry(i);
 
         //if((i-evStart)%treeStep==0) {
@@ -575,8 +578,8 @@ void readLCTAnalyzer(TString _input_="./csctf_Run246926.root", TString _output_=
             //outfile << "------------------" << endl;
 
 	    bool ifOneHitStat(diffstation.size()==allstation.size());
-	    //if(!ifOneHitStat) continue;
-	    if(allphiG.size()<5) continue;
+	    if(!ifOneHitStat) continue;
+	    if(allphiG.size()<2) continue;
 
             //if(allphiG.size()<5) continue;
             std::vector<CSCTF_t> deltaPhiEtas = dofit(allphiG,alletaG,allzG,allendcap,allsector,allstation,allring,allcscid);
@@ -609,7 +612,11 @@ void readLCTAnalyzer(TString _input_="./csctf_Run246926.root", TString _output_=
 		float dr0 = deltaPhiEtas[j].dr0;
 		float chi2 = deltaPhiEtas[j].chi2;
 
-                if( fabs(p0)>200 || fabs(p1)>200 || fabs(p2)>200 || fabs(p3)>200 || distance>50) continue;
+		//if(chi2>0.1) continue;
+                //if( fabs(p0)>200 || fabs(p1)>200 || fabs(p2)>200 || fabs(p3)>200 || distance>50 || chi2>0.1 || dr0 > 500) continue;
+                if( fabs(p0)>200 || fabs(p1)>200 || fabs(p2)>200 || fabs(p3)>200 || chi2>0.5 ||  dr0 > 500) continue;
+
+
 
 
                 if(iendcap==1) {

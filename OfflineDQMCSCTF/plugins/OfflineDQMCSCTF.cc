@@ -166,6 +166,7 @@ OfflineDQMCSCTF::OfflineDQMCSCTF(const edm::ParameterSet& iConfig) :
 
 
     gangedME1a_ = iConfig.getUntrackedParameter<bool>("gangedME1a", false);
+    std::cout << "gangedME1a_: " << gangedME1a_ << std::endl;
 
 }
 
@@ -416,7 +417,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
     //resolution of LUTs -- Minus EndCap
     ev.nlcts_m = 0;
-    if(saveGblPhi_m.size()>4) {
+    if(saveGblPhi_m.size()>2) { // at least 3 hits for tracks
 
         bool hasSameSector_m(true);
         for(size_t i=0; i<saveSector_m.size(); i++) {
@@ -443,12 +444,13 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
                 ev.lct_m_gblphi[ev.nlcts_m] = saveGblPhi_m[j];
                 ev.lct_m_gbleta[ev.nlcts_m] = saveGblEta_m[j];
-                ev.lct_m_gblZ[ev.nlcts_m] = saveGblZ_m[j];
+                ev.lct_m_gblZ[ev.nlcts_m]   = saveGblZ_m[j];
                 ev.lct_m_endcap[ev.nlcts_m] = saveEndcaps_m[j];
                 ev.lct_m_station[ev.nlcts_m]= saveStations_m[j];
                 ev.lct_m_ring[ev.nlcts_m]   = saveRings_m[j];
+		ev.lct_m_cscid[ev.nlcts_m]  = saveCscId_m[j];
                 ev.lct_m_sector[ev.nlcts_m] = saveSector_m[j];
-                ev.lct_m_bptx[ev.nlcts_m] = saveBPTX_m[j];
+                ev.lct_m_bptx[ev.nlcts_m]   = saveBPTX_m[j];
 
                 ev.nlcts_m++;
             }
@@ -458,7 +460,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
     //resolution of LUTs -- Plus EndCap
     ev.nlcts_p = 0;
-    if(saveGblPhi_p.size()>4) {
+    if(saveGblPhi_p.size()>2) { // at least 3 hits for tracks
 
         bool hasSameSector_p(true);
         for(size_t i=0; i<saveSector_p.size(); i++) {
@@ -485,12 +487,13 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
                 ev.lct_p_gblphi[ev.nlcts_p] = saveGblPhi_p[j];
                 ev.lct_p_gbleta[ev.nlcts_p] = saveGblEta_p[j];
-                ev.lct_p_gblZ[ev.nlcts_p] = saveGblZ_p[j];
+                ev.lct_p_gblZ[ev.nlcts_p]   = saveGblZ_p[j];
                 ev.lct_p_endcap[ev.nlcts_p] = saveEndcaps_p[j];
                 ev.lct_p_station[ev.nlcts_p]= saveStations_p[j];
                 ev.lct_p_ring[ev.nlcts_p]   = saveRings_p[j];
+		ev.lct_p_cscid[ev.nlcts_p]  = saveCscId_p[j];
                 ev.lct_p_sector[ev.nlcts_p] = saveSector_p[j];
-                ev.lct_p_bptx[ev.nlcts_p] = saveBPTX_p[j];
+                ev.lct_p_bptx[ev.nlcts_p]   = saveBPTX_p[j];
 
                 ev.nlcts_p++;
             }

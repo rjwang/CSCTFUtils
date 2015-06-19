@@ -69,8 +69,8 @@ process.source = cms.Source("PoolSource",
 	#'/store/data/Run2015A/Commissioning/RAW/v1/000/246/963/00000/FC19C2AD-5B0A-E511-B4D3-02163E0139DE.root',
 
  '/store/data/Run2015A/SingleMu/RAW/v1/000/246/963/00000/06A0F6A7-5B0A-E511-BEDE-02163E0141FA.root',
- '/store/data/Run2015A/SingleMu/RAW/v1/000/246/963/00000/0C948DA8-5B0A-E511-B90C-02163E013979.root',
- '/store/data/Run2015A/SingleMu/RAW/v1/000/246/963/00000/28B6F4A8-5B0A-E511-80FC-02163E014614.root',
+# '/store/data/Run2015A/SingleMu/RAW/v1/000/246/963/00000/0C948DA8-5B0A-E511-B90C-02163E013979.root',
+# '/store/data/Run2015A/SingleMu/RAW/v1/000/246/963/00000/28B6F4A8-5B0A-E511-80FC-02163E014614.root',
 # '/store/data/Run2015A/SingleMu/RAW/v1/000/246/963/00000/34E885B1-5B0A-E511-B87A-02163E01478F.root',
 # '/store/data/Run2015A/SingleMu/RAW/v1/000/246/963/00000/38C5F5E0-800A-E511-9C3A-02163E013675.root',
 # '/store/data/Run2015A/SingleMu/RAW/v1/000/246/963/00000/3A9F3BE2-800A-E511-9B71-02163E011B58.root',
@@ -131,3 +131,7 @@ process.csctfDigis.producer = cms.InputTag("rawDataCollector")
 
 
 process.p = cms.Path(process.RawToDigi * process.OfflineDQMCSCTF)
+
+
+### local run
+process.OfflineDQMCSCTF.verbose = cms.untracked.bool(True)

@@ -12,6 +12,7 @@ LSFJOB*
 python/__init__.py
 *_.cxx*
 *__cxx*
+.__afs*
 
 
 

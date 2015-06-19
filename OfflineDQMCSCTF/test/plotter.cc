@@ -6,10 +6,10 @@
 
 
 
-void plotter()
+void plotter(TString Input="output_test.root")
 {
 
-    TFile *infile = TFile::Open("output_test.root", "READ");
+    TFile *infile = TFile::Open(Input, "READ");
 
     vector<TString> All1Dhists;
 
@@ -110,6 +110,8 @@ void plotter()
 
     All1Dhists.push_back("h_p_dr0");
     All1Dhists.push_back("h_m_dr0");
+    All1Dhists.push_back("h_m_chi2");
+    All1Dhists.push_back("h_p_chi2");
 
 
 
