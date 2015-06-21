@@ -62,10 +62,12 @@ getDeltaPhiEta(double *par, double phi, double eta, double z)
 
 
     // delta Eta
-    double cal_theta = TMath::ATan( fabs(y/z) );
-    if(z<0) cal_theta = M_PI - cal_theta;
-    double cal_eta = (-1.)*TMath::Log10(TMath::Tan(cal_theta/2.))/TMath::LogE();
+    double r = sqrt(x*x+y*y);
+    double cal_theta = TMath::ATan( fabs(r/z) );
+    double cal_eta = (-1.)*log( TMath::Tan( cal_theta/2. ) );
+
     if(z<0) cal_eta = -1.*fabs(cal_eta);
+    else cal_eta = fabs(cal_eta);
 
     double det_eta = cal_eta-eta;
 
@@ -81,8 +83,9 @@ getDeltaPhiEta(double *par, double phi, double eta, double z)
 double getDistance(double *par, double phi, double eta, double z)
 {
     double theta = 2*TMath::ATan(exp(-1.*eta));
-    double y = z*TMath::Tan(theta);
-    double x = y/TMath::Tan(phi);
+    double r = fabs(z*TMath::Tan(theta));
+    double y = r*TMath::Sin(phi);
+    double x = r*TMath::Cos(phi);
 
     if(phi>=0                  && phi<M_PI/2. )       {
         x=fabs(x);
@@ -179,8 +182,9 @@ dofit(std::vector<double> allphiG, std::vector<double> alletaG, std::vector<doub
             double theta = 2.*TMath::ATan(exp(-1.*etaG));
 
             double z = zG;
-            double y = z*TMath::Tan(theta);
-            double x = y/TMath::Tan(phiG);
+	    double r = fabs(z*TMath::Tan(theta));
+	    double y = r*TMath::Sin(phiG);
+	    double x = r*TMath::Cos(phiG);
 
             if(phiG>=0 			&& phiG<M_PI/2.	) 	{
                 x=fabs(x);
@@ -273,20 +277,34 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
     TString outputLOG = _output_;
     outputLOG.ReplaceAll(".root",".log");
     ofstream outfile;
-    outfile.open (outputLOG);
+    outfile.open ("/tmp/rewang/"+outputLOG);
+
 
 
     Int_t nlcts_m;
-    Float_t lct_m_gblphi[MAXLUTS], lct_m_gbleta[MAXLUTS], lct_m_gblZ[MAXLUTS];
-    Int_t lct_m_station[MAXLUTS], lct_m_ring[MAXLUTS], lct_m_cscid[MAXLUTS], lct_m_endcap[MAXLUTS], lct_m_sector[MAXLUTS], lct_m_bptx[MAXLUTS];
+    Float_t lct_m_gblphi[MAXLUTS], lct_m_lclphi[MAXLUTS], lct_m_pkdphi[MAXLUTS];
+    Float_t lct_m_gbleta[MAXLUTS], lct_m_pkdeta[MAXLUTS];
+    Float_t lct_m_gblZ[MAXLUTS];
+    Int_t lct_m_station[MAXLUTS], lct_m_ring[MAXLUTS], lct_m_endcap[MAXLUTS], lct_m_sector[MAXLUTS], lct_m_bptx[MAXLUTS];
+    Int_t lct_m_cscid[MAXLUTS];
+    Int_t lct_m_strip[MAXLUTS], lct_m_keywire[MAXLUTS];
 
     Int_t nlcts_p;
-    Float_t lct_p_gblphi[MAXLUTS], lct_p_gbleta[MAXLUTS], lct_p_gblZ[MAXLUTS];
-    Int_t lct_p_station[MAXLUTS], lct_p_ring[MAXLUTS], lct_p_cscid[MAXLUTS], lct_p_endcap[MAXLUTS], lct_p_sector[MAXLUTS], lct_p_bptx[MAXLUTS];
+    Float_t lct_p_gblphi[MAXLUTS], lct_p_lclphi[MAXLUTS], lct_p_pkdphi[MAXLUTS];
+    Float_t lct_p_gbleta[MAXLUTS], lct_p_pkdeta[MAXLUTS];
+    Float_t lct_p_gblZ[MAXLUTS];
+    Int_t lct_p_station[MAXLUTS], lct_p_ring[MAXLUTS], lct_p_endcap[MAXLUTS], lct_p_sector[MAXLUTS], lct_p_bptx[MAXLUTS];
+    Int_t lct_p_cscid[MAXLUTS];
+    Int_t lct_p_strip[MAXLUTS], lct_p_keywire[MAXLUTS];
+
+
 
     t_->SetBranchAddress("nlcts_m", &nlcts_m);
     t_->SetBranchAddress("lct_m_gblphi", lct_m_gblphi);
+    t_->SetBranchAddress("lct_m_lclphi", lct_m_lclphi);
+    t_->SetBranchAddress("lct_m_pkdphi", lct_m_pkdphi);
     t_->SetBranchAddress("lct_m_gbleta", lct_m_gbleta);
+    t_->SetBranchAddress("lct_m_pkdeta", lct_m_pkdeta);
     t_->SetBranchAddress("lct_m_gblZ", lct_m_gblZ);
     t_->SetBranchAddress("lct_m_station", lct_m_station);
     t_->SetBranchAddress("lct_m_ring", lct_m_ring);
@@ -294,10 +312,15 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
     t_->SetBranchAddress("lct_m_endcap", lct_m_endcap);
     t_->SetBranchAddress("lct_m_sector", lct_m_sector);
     t_->SetBranchAddress("lct_m_bptx", lct_m_bptx);
+    t_->SetBranchAddress("lct_m_strip", lct_m_strip);
+    t_->SetBranchAddress("lct_m_keywire", lct_m_keywire);
 
     t_->SetBranchAddress("nlcts_p", &nlcts_p);
     t_->SetBranchAddress("lct_p_gblphi", lct_p_gblphi);
+    t_->SetBranchAddress("lct_p_lclphi", lct_p_lclphi);
+    t_->SetBranchAddress("lct_p_pkdphi", lct_p_pkdphi);
     t_->SetBranchAddress("lct_p_gbleta", lct_p_gbleta);
+    t_->SetBranchAddress("lct_p_pkdeta", lct_p_pkdeta);
     t_->SetBranchAddress("lct_p_gblZ", lct_p_gblZ);
     t_->SetBranchAddress("lct_p_station", lct_p_station);
     t_->SetBranchAddress("lct_p_ring", lct_p_ring);
@@ -305,7 +328,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
     t_->SetBranchAddress("lct_p_endcap", lct_p_endcap);
     t_->SetBranchAddress("lct_p_sector", lct_p_sector);
     t_->SetBranchAddress("lct_p_bptx", lct_p_bptx);
-
+    t_->SetBranchAddress("lct_p_strip", lct_p_strip);
+    t_->SetBranchAddress("lct_p_keywire", lct_p_keywire);
 
 
 
@@ -329,29 +353,81 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
 
     /////////////////////
 
-    TH2F *h_dEtavs10degPhi_MEp11 = new TH2F("h_dEtavs10degPhi_MEp11","; #it{#phi}(Fit) [degree], ME+1/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEp11a = new TH2F("h_dEtavs10degPhi_MEp11a","; #it{#phi}(Fit) [degree], ME+1/1a; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEp11b = new TH2F("h_dEtavs10degPhi_MEp11b","; #it{#phi}(Fit) [degree], ME+1/1b; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEp12 = new TH2F("h_dEtavs10degPhi_MEp12","; #it{#phi}(Fit) [degree], ME+1/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEp13 = new TH2F("h_dEtavs10degPhi_MEp13","; #it{#phi}(Fit) [degree], ME+1/3; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEp21 = new TH2F("h_dEtavs10degPhi_MEp21","; #it{#phi}(Fit) [degree], ME+2/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEp22 = new TH2F("h_dEtavs10degPhi_MEp22","; #it{#phi}(Fit) [degree], ME+2/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEp31 = new TH2F("h_dEtavs10degPhi_MEp31","; #it{#phi}(Fit) [degree], ME+3/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEp32 = new TH2F("h_dEtavs10degPhi_MEp32","; #it{#phi}(Fit) [degree], ME+3/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEp41 = new TH2F("h_dEtavs10degPhi_MEp41","; #it{#phi}(Fit) [degree], ME+4/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEp42 = new TH2F("h_dEtavs10degPhi_MEp42","; #it{#phi}(Fit) [degree], ME+4/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEp11 = new TH2F("h_dEtavs10degPhi_MEp11","; #it{#phi}(Fit) [degree], ME+1/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEp11a = new TH2F("h_dEtavs10degPhi_MEp11a","; #it{#phi}(Fit) [degree], ME+1/1a; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEp11b = new TH2F("h_dEtavs10degPhi_MEp11b","; #it{#phi}(Fit) [degree], ME+1/1b; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEp12 = new TH2F("h_dEtavs10degPhi_MEp12","; #it{#phi}(Fit) [degree], ME+1/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEp13 = new TH2F("h_dEtavs10degPhi_MEp13","; #it{#phi}(Fit) [degree], ME+1/3; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEp21 = new TH2F("h_dEtavs10degPhi_MEp21","; #it{#phi}(Fit) [degree], ME+2/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEp22 = new TH2F("h_dEtavs10degPhi_MEp22","; #it{#phi}(Fit) [degree], ME+2/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEp31 = new TH2F("h_dEtavs10degPhi_MEp31","; #it{#phi}(Fit) [degree], ME+3/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEp32 = new TH2F("h_dEtavs10degPhi_MEp32","; #it{#phi}(Fit) [degree], ME+3/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEp41 = new TH2F("h_dEtavs10degPhi_MEp41","; #it{#phi}(Fit) [degree], ME+4/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEp42 = new TH2F("h_dEtavs10degPhi_MEp42","; #it{#phi}(Fit) [degree], ME+4/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
 
-    TH2F *h_dEtavs10degPhi_MEm11 = new TH2F("h_dEtavs10degPhi_MEm11","; #it{#phi}(Fit) [degree], ME-1/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEm11a = new TH2F("h_dEtavs10degPhi_MEm11a","; #it{#phi}(Fit) [degree], ME-1/1a; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEm11b = new TH2F("h_dEtavs10degPhi_MEm11b","; #it{#phi}(Fit) [degree], ME-1/1b; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEm12 = new TH2F("h_dEtavs10degPhi_MEm12","; #it{#phi}(Fit) [degree], ME-1/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEm13 = new TH2F("h_dEtavs10degPhi_MEm13","; #it{#phi}(Fit) [degree], ME-1/3; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEm21 = new TH2F("h_dEtavs10degPhi_MEm21","; #it{#phi}(Fit) [degree], ME-2/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEm22 = new TH2F("h_dEtavs10degPhi_MEm22","; #it{#phi}(Fit) [degree], ME-2/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEm31 = new TH2F("h_dEtavs10degPhi_MEm31","; #it{#phi}(Fit) [degree], ME-3/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEm32 = new TH2F("h_dEtavs10degPhi_MEm32","; #it{#phi}(Fit) [degree], ME-3/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEm41 = new TH2F("h_dEtavs10degPhi_MEm41","; #it{#phi}(Fit) [degree], ME-4/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
-    TH2F *h_dEtavs10degPhi_MEm42 = new TH2F("h_dEtavs10degPhi_MEm42","; #it{#phi}(Fit) [degree], ME-4/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,500,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEm11 = new TH2F("h_dEtavs10degPhi_MEm11","; #it{#phi}(Fit) [degree], ME-1/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEm11a = new TH2F("h_dEtavs10degPhi_MEm11a","; #it{#phi}(Fit) [degree], ME-1/1a; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEm11b = new TH2F("h_dEtavs10degPhi_MEm11b","; #it{#phi}(Fit) [degree], ME-1/1b; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEm12 = new TH2F("h_dEtavs10degPhi_MEm12","; #it{#phi}(Fit) [degree], ME-1/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEm13 = new TH2F("h_dEtavs10degPhi_MEm13","; #it{#phi}(Fit) [degree], ME-1/3; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEm21 = new TH2F("h_dEtavs10degPhi_MEm21","; #it{#phi}(Fit) [degree], ME-2/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEm22 = new TH2F("h_dEtavs10degPhi_MEm22","; #it{#phi}(Fit) [degree], ME-2/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEm31 = new TH2F("h_dEtavs10degPhi_MEm31","; #it{#phi}(Fit) [degree], ME-3/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEm32 = new TH2F("h_dEtavs10degPhi_MEm32","; #it{#phi}(Fit) [degree], ME-3/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEm41 = new TH2F("h_dEtavs10degPhi_MEm41","; #it{#phi}(Fit) [degree], ME-4/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+    TH2F *h_dEtavs10degPhi_MEm42 = new TH2F("h_dEtavs10degPhi_MEm42","; #it{#phi}(Fit) [degree], ME-4/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",288,0,360,100,-0.2,0.2);
+
+    /////////////////////
+
+    TH2F *h_dEtavsFitEta_MEp11 = new TH2F("h_dEtavsFitEta_MEp11","; #it{#eta}(Fit), ME+1/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEp11a = new TH2F("h_dEtavsFitEta_MEp11a","; #it{#eta}(Fit), ME+1/1a; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEp11b = new TH2F("h_dEtavsFitEta_MEp11b","; #it{#eta}(Fit), ME+1/1b; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEp12 = new TH2F("h_dEtavsFitEta_MEp12","; #it{#eta}(Fit), ME+1/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEp13 = new TH2F("h_dEtavsFitEta_MEp13","; #it{#eta}(Fit), ME+1/3; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEp21 = new TH2F("h_dEtavsFitEta_MEp21","; #it{#eta}(Fit), ME+2/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEp22 = new TH2F("h_dEtavsFitEta_MEp22","; #it{#eta}(Fit), ME+2/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEp31 = new TH2F("h_dEtavsFitEta_MEp31","; #it{#eta}(Fit), ME+3/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEp32 = new TH2F("h_dEtavsFitEta_MEp32","; #it{#eta}(Fit), ME+3/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEp41 = new TH2F("h_dEtavsFitEta_MEp41","; #it{#eta}(Fit), ME+4/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEp42 = new TH2F("h_dEtavsFitEta_MEp42","; #it{#eta}(Fit), ME+4/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+
+    TH2F *h_dEtavsFitEta_MEm11 = new TH2F("h_dEtavsFitEta_MEm11","; #it{#eta}(Fit), ME-1/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEm11a = new TH2F("h_dEtavsFitEta_MEm11a","; #it{#eta}(Fit), ME-1/1a; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEm11b = new TH2F("h_dEtavsFitEta_MEm11b","; #it{#eta}(Fit), ME-1/1b; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEm12 = new TH2F("h_dEtavsFitEta_MEm12","; #it{#eta}(Fit), ME-1/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEm13 = new TH2F("h_dEtavsFitEta_MEm13","; #it{#eta}(Fit), ME-1/3; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEm21 = new TH2F("h_dEtavsFitEta_MEm21","; #it{#eta}(Fit), ME-2/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEm22 = new TH2F("h_dEtavsFitEta_MEm22","; #it{#eta}(Fit), ME-2/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEm31 = new TH2F("h_dEtavsFitEta_MEm31","; #it{#eta}(Fit), ME-3/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEm32 = new TH2F("h_dEtavsFitEta_MEm32","; #it{#eta}(Fit), ME-3/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEm41 = new TH2F("h_dEtavsFitEta_MEm41","; #it{#eta}(Fit), ME-4/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsFitEta_MEm42 = new TH2F("h_dEtavsFitEta_MEm42","; #it{#eta}(Fit), ME-4/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+
+
+    TH2F *h_dEtavsLUTEta_MEp11 = new TH2F("h_dEtavsLUTEta_MEp11","; #it{#eta}(LUT), ME+1/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEp11a = new TH2F("h_dEtavsLUTEta_MEp11a","; #it{#eta}(LUT), ME+1/1a; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEp11b = new TH2F("h_dEtavsLUTEta_MEp11b","; #it{#eta}(LUT), ME+1/1b; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEp12 = new TH2F("h_dEtavsLUTEta_MEp12","; #it{#eta}(LUT), ME+1/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEp13 = new TH2F("h_dEtavsLUTEta_MEp13","; #it{#eta}(LUT), ME+1/3; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEp21 = new TH2F("h_dEtavsLUTEta_MEp21","; #it{#eta}(LUT), ME+2/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEp22 = new TH2F("h_dEtavsLUTEta_MEp22","; #it{#eta}(LUT), ME+2/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEp31 = new TH2F("h_dEtavsLUTEta_MEp31","; #it{#eta}(LUT), ME+3/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEp32 = new TH2F("h_dEtavsLUTEta_MEp32","; #it{#eta}(LUT), ME+3/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEp41 = new TH2F("h_dEtavsLUTEta_MEp41","; #it{#eta}(LUT), ME+4/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEp42 = new TH2F("h_dEtavsLUTEta_MEp42","; #it{#eta}(LUT), ME+4/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,0.9,2.5,100,-0.2,0.2);
+
+    TH2F *h_dEtavsLUTEta_MEm11 = new TH2F("h_dEtavsLUTEta_MEm11","; #it{#eta}(LUT), ME-1/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEm11a = new TH2F("h_dEtavsLUTEta_MEm11a","; #it{#eta}(LUT), ME-1/1a; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEm11b = new TH2F("h_dEtavsLUTEta_MEm11b","; #it{#eta}(LUT), ME-1/1b; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEm12 = new TH2F("h_dEtavsLUTEta_MEm12","; #it{#eta}(LUT), ME-1/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEm13 = new TH2F("h_dEtavsLUTEta_MEm13","; #it{#eta}(LUT), ME-1/3; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEm21 = new TH2F("h_dEtavsLUTEta_MEm21","; #it{#eta}(LUT), ME-2/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEm22 = new TH2F("h_dEtavsLUTEta_MEm22","; #it{#eta}(LUT), ME-2/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEm31 = new TH2F("h_dEtavsLUTEta_MEm31","; #it{#eta}(LUT), ME-3/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEm32 = new TH2F("h_dEtavsLUTEta_MEm32","; #it{#eta}(LUT), ME-3/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEm41 = new TH2F("h_dEtavsLUTEta_MEm41","; #it{#eta}(LUT), ME-4/1; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+    TH2F *h_dEtavsLUTEta_MEm42 = new TH2F("h_dEtavsLUTEta_MEm42","; #it{#eta}(LUT), ME-4/2; #it{#eta}(Fit) - #it{#eta}(LUT);Events",100,-2.5,-0.9,100,-0.2,0.2);
+
 
     ////////////////////
 
@@ -537,12 +613,14 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                 double phiG = lct_p_gblphi[n];
                 double etaG = lct_p_gbleta[n];
                 double zG = lct_p_gblZ[n];
-                double endcap = lct_p_endcap[n];
+                int endcap = lct_p_endcap[n];
 		int sector = lct_p_sector[n];
 		int bptx = lct_p_bptx[n];
-                double ring = lct_p_ring[n];
-                double station = lct_p_station[n];
+                int ring = lct_p_ring[n];
+                int station = lct_p_station[n];
 		int cscid = lct_p_cscid[n];
+		int strip = lct_p_strip[n];
+		int keywire = lct_p_keywire[n];
 
                 if(iendcap==1) {
                     phiG = lct_m_gblphi[n];
@@ -554,9 +632,18 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                     ring = lct_m_ring[n];
                     station = lct_m_station[n];
 		    cscid = lct_m_cscid[n];
+		    strip = lct_m_strip[n];
+		    keywire = lct_m_keywire[n];
                 }
 
 		if(bptx!=6) continue;
+
+
+		if(station==0 && ring==1){
+			//wire 12-15 is shared: 11-14 in software
+			if(strip>=127 && keywire>14) continue;
+			if(strip<127 && keywire<11) continue;
+		}
 
 
 		auto it = std::find(diffstation.begin(), diffstation.end(), station);
@@ -614,7 +701,9 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
 
 		//if(chi2>0.1) continue;
                 //if( fabs(p0)>200 || fabs(p1)>200 || fabs(p2)>200 || fabs(p3)>200 || distance>50 || chi2>0.1 || dr0 > 500) continue;
-                if( fabs(p0)>200 || fabs(p1)>200 || fabs(p2)>200 || fabs(p3)>200 || chi2>0.5 ||  dr0 > 500) continue;
+
+                //if( fabs(p0)>200 || fabs(p1)>200 || fabs(p2)>200 || fabs(p3)>200 || chi2>0.5 ||  dr0 > 500) continue;
+		if( chi2>0.05 || dr0>500) continue;
 
 
 
@@ -644,7 +733,7 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
 			<< " cscid: " << cscid
 			<< endl;
 
-/*
+
                 //if(fabs(d_phi)>2)
                 outfile << "status: " << std::setprecision(1) << status << "\t"
                         << " rawphi: " << std::setprecision(5) << rawphi << "\t"
@@ -660,7 +749,7 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         << " p3: " << std::setprecision(5) << p3
                         << " distance: " << std::setprecision(5) << distance
                         ;
-*/
+
 
                 h_deltaPhi->Fill(d_phi);
                 h_deltaEta->Fill(d_eta);
@@ -749,17 +838,23 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
 
 			h_dEtavs10degPhi_MEp11 -> Fill(newphi,d_eta);
 			h_dPhivs10degPhi_MEp11 -> Fill(newphi,d_phi);
+			h_dEtavsFitEta_MEp11 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEp11 -> Fill(raweta,d_eta);
 			if(fabs(raweta)>2.05) {
 				h_deltaPhiMEp11a  -> Fill(d_phi);
 				h_deltaEtaMEp11a  -> Fill(d_eta);
                         	h_dEtavs10degPhi_MEp11a -> Fill(newphi,d_eta);
                         	h_dPhivs10degPhi_MEp11a -> Fill(newphi,d_phi);
+				h_dEtavsFitEta_MEp11a -> Fill(caleta,d_eta);
+				h_dEtavsLUTEta_MEp11a -> Fill(raweta,d_eta);
 			}
 			else{
 				h_deltaPhiMEp11b  -> Fill(d_phi);
 				h_deltaEtaMEp11b  -> Fill(d_eta);
                         	h_dEtavs10degPhi_MEp11b -> Fill(newphi,d_eta);
                         	h_dPhivs10degPhi_MEp11b -> Fill(newphi,d_phi);
+				h_dEtavsFitEta_MEp11b -> Fill(caleta,d_eta);
+				h_dEtavsLUTEta_MEp11b -> Fill(raweta,d_eta);
 			}
                     }
                     if(endcap == 1) {
@@ -772,17 +867,23 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         if(newphi>=360) newphi -= 360;
                         h_dEtavs10degPhi_MEm11 -> Fill(newphi,d_eta);
                         h_dPhivs10degPhi_MEm11 -> Fill(newphi,d_phi);
+			h_dEtavsFitEta_MEm11 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEm11 -> Fill(raweta,d_eta);
                         if(fabs(raweta)>2.05) {
                                 h_deltaPhiMEm11a  -> Fill(d_phi);
                                 h_deltaEtaMEm11a  -> Fill(d_eta);
                                 h_dEtavs10degPhi_MEm11a -> Fill(newphi,d_eta);
                                 h_dPhivs10degPhi_MEm11a -> Fill(newphi,d_phi);
+				h_dEtavsFitEta_MEm11a -> Fill(caleta,d_eta);
+				h_dEtavsLUTEta_MEm11a -> Fill(raweta,d_eta);
 			}
                         else{
                                 h_deltaPhiMEm11b  -> Fill(d_phi);
                                 h_deltaEtaMEm11b  -> Fill(d_eta);
                                 h_dEtavs10degPhi_MEm11b -> Fill(newphi,d_eta);
                                 h_dPhivs10degPhi_MEm11b -> Fill(newphi,d_phi);
+				h_dEtavsFitEta_MEm11b -> Fill(caleta,d_eta);
+				h_dEtavsLUTEta_MEm11b -> Fill(raweta,d_eta);
                         }
                     }
                 }
@@ -794,6 +895,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEp12  -> Fill(d_eta);
                         h_dEtavs10degPhi_MEp12 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEp12 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEp12 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEp12 -> Fill(raweta,d_eta);
                     }
                     if(endcap == 1) {
                         outfile << " ME_M_1_2" << endl;
@@ -801,6 +904,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEm12 -> Fill(d_eta);
                         h_dEtavs10degPhi_MEm12 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEm12 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEm12 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEm12 -> Fill(raweta,d_eta);
                     }
                 }
                 //ME1/3
@@ -811,6 +916,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEp13  -> Fill(d_eta);
                         h_dEtavs10degPhi_MEp13 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEp13 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEp13 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEp13 -> Fill(raweta,d_eta);
                     }
                     if(endcap == 1) {
                         outfile << " ME_M_1_3" << endl;
@@ -818,6 +925,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEm13 -> Fill(d_eta);
                         h_dEtavs10degPhi_MEm13 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEm13 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEm13 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEm13 -> Fill(raweta,d_eta);
                     }
                 }
 
@@ -829,6 +938,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEp21  -> Fill(d_eta);
                         h_dEtavs10degPhi_MEp21 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEp21 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEp21 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEp21 -> Fill(raweta,d_eta);
                     }
                     if(endcap == 1) {
                         outfile << " ME_M_2_1" << endl;
@@ -836,6 +947,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEm21 -> Fill(d_eta);
                         h_dEtavs10degPhi_MEm21 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEm21 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEm21 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEm21 -> Fill(raweta,d_eta);
                     }
                 }
                 //ME2/2
@@ -846,6 +959,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEp22  -> Fill(d_eta);
                         h_dEtavs10degPhi_MEp22 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEp22 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEp22 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEp22 -> Fill(raweta,d_eta);
                     }
                     if(endcap == 1) {
                         outfile << " ME_M_2_2" << endl;
@@ -853,6 +968,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEm22 -> Fill(d_eta);
                         h_dEtavs10degPhi_MEm22 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEm22 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEm22 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEm22 -> Fill(raweta,d_eta);
                     }
                 }
                 //ME3/1
@@ -863,6 +980,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEp31  -> Fill(d_eta);
                         h_dEtavs10degPhi_MEp31 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEp31 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEp31 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEp31 -> Fill(raweta,d_eta);
                     }
                     if(endcap == 1) {
                         outfile << " ME_M_3_1" << endl;
@@ -870,6 +989,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEm31 -> Fill(d_eta);
                         h_dEtavs10degPhi_MEm31 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEm31 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEm31 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEm31 -> Fill(raweta,d_eta);
                     }
                 }
                 //ME3/2
@@ -880,6 +1001,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEp32  -> Fill(d_eta);
                         h_dEtavs10degPhi_MEp32 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEp32 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEp32 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEp32 -> Fill(raweta,d_eta);
                     }
                     if(endcap == 1) {
                         outfile << " ME_M_3_2" << endl;
@@ -887,6 +1010,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEm32 -> Fill(d_eta);
                         h_dEtavs10degPhi_MEm32 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEm32 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEm32 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEm32 -> Fill(raweta,d_eta);
                     }
                 }
                 //ME4/1
@@ -897,6 +1022,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEp41  -> Fill(d_eta);
                         h_dEtavs10degPhi_MEp41 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEp41 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEp41 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEp41 -> Fill(raweta,d_eta);
                     }
                     if(endcap == 1) {
                         outfile << " ME_M_4_1" << endl;
@@ -904,6 +1031,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEm41 -> Fill(d_eta);
                         h_dEtavs10degPhi_MEm41 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEm41 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEm41 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEm41 -> Fill(raweta,d_eta);
                     }
                 }
                 //ME4/2
@@ -914,6 +1043,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEp42  -> Fill(d_eta);
                         h_dEtavs10degPhi_MEp42 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEp42 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEp42 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEp42 -> Fill(raweta,d_eta);
                     }
                     if(endcap == 1) {
                         outfile << " ME_M_4_2" << endl;
@@ -921,6 +1052,8 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
                         h_deltaEtaMEm42 -> Fill(d_eta);
                         h_dEtavs10degPhi_MEm42 -> Fill(calphi*180./M_PI,d_eta);
                         h_dPhivs10degPhi_MEm42 -> Fill(calphi*180./M_PI,d_phi);
+			h_dEtavsFitEta_MEm42 -> Fill(caleta,d_eta);
+			h_dEtavsLUTEta_MEm42 -> Fill(raweta,d_eta);
                     }
                 }
 
@@ -1073,6 +1206,57 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
     h_dEtavs10degPhi_MEm32->Write();
     h_dEtavs10degPhi_MEm41->Write();
     h_dEtavs10degPhi_MEm42->Write();
+
+
+    h_dEtavsFitEta_MEp11->Write();
+    h_dEtavsFitEta_MEp11a->Write();
+    h_dEtavsFitEta_MEp11b->Write();
+    h_dEtavsFitEta_MEp12->Write();
+    h_dEtavsFitEta_MEp13->Write();
+    h_dEtavsFitEta_MEp21->Write();
+    h_dEtavsFitEta_MEp22->Write();
+    h_dEtavsFitEta_MEp31->Write();
+    h_dEtavsFitEta_MEp32->Write();
+    h_dEtavsFitEta_MEp41->Write();
+    h_dEtavsFitEta_MEp42->Write();
+    h_dEtavsFitEta_MEm11->Write();
+    h_dEtavsFitEta_MEm11a->Write();
+    h_dEtavsFitEta_MEm11b->Write();
+    h_dEtavsFitEta_MEm12->Write();
+    h_dEtavsFitEta_MEm13->Write();
+    h_dEtavsFitEta_MEm21->Write();
+    h_dEtavsFitEta_MEm22->Write();
+    h_dEtavsFitEta_MEm31->Write();
+    h_dEtavsFitEta_MEm32->Write();
+    h_dEtavsFitEta_MEm41->Write();
+    h_dEtavsFitEta_MEm42->Write();
+
+
+    h_dEtavsLUTEta_MEp11->Write();
+    h_dEtavsLUTEta_MEp11a->Write();
+    h_dEtavsLUTEta_MEp11b->Write();
+    h_dEtavsLUTEta_MEp12->Write();
+    h_dEtavsLUTEta_MEp13->Write();
+    h_dEtavsLUTEta_MEp21->Write();
+    h_dEtavsLUTEta_MEp22->Write();
+    h_dEtavsLUTEta_MEp31->Write();
+    h_dEtavsLUTEta_MEp32->Write();
+    h_dEtavsLUTEta_MEp41->Write();
+    h_dEtavsLUTEta_MEp42->Write();
+    h_dEtavsLUTEta_MEm11->Write();
+    h_dEtavsLUTEta_MEm11a->Write();
+    h_dEtavsLUTEta_MEm11b->Write();
+    h_dEtavsLUTEta_MEm12->Write();
+    h_dEtavsLUTEta_MEm13->Write();
+    h_dEtavsLUTEta_MEm21->Write();
+    h_dEtavsLUTEta_MEm22->Write();
+    h_dEtavsLUTEta_MEm31->Write();
+    h_dEtavsLUTEta_MEm32->Write();
+    h_dEtavsLUTEta_MEm41->Write();
+    h_dEtavsLUTEta_MEm42->Write();
+
+
+
 
 
     h_dPhivs10degPhi_MEp11->Write();

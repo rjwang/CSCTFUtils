@@ -23,4 +23,5 @@ plot:
 	@mv *.png ~/www/my_public/CSCTF_LUTRel/
 	@mv *.pdf ~/www/my_public/CSCTF_LUTRel/
 
-
+clean:
+	@rm output_test_*.root
