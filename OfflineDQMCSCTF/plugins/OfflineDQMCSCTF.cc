@@ -88,7 +88,8 @@ private:
     bool gangedME1a_;
     bool verbose_;
     //CSCSectorReceiverLUT *srLUTs_[5];
-    CSCSectorReceiverLUT* srLUTs_[5][2];
+    //CSCSectorReceiverLUT* srLUTs_[5][2];
+    CSCSectorReceiverLUT* srLUTs_[5][2][6];
 
 
     DataEvtSummaryHandler summaryHandler_;
@@ -130,7 +131,7 @@ OfflineDQMCSCTF::OfflineDQMCSCTF(const edm::ParameterSet& iConfig) :
 
 
     bzero(srLUTs_ , sizeof(srLUTs_));
-    int sector=1;    // assume SR LUTs are all same for every sector
+    //int sector=1;    // assume SR LUTs are all same for every sector
     bool TMB07=true; // specific TMB firmware
     // Create a pset for SR/PT LUTs: if you do not change the value in the
     // configuration file, it will load the default minitLUTs
@@ -141,26 +142,30 @@ OfflineDQMCSCTF::OfflineDQMCSCTF(const edm::ParameterSet& iConfig) :
 
     // positive endcap
     int endcap = 1;
-    for(int station=1,fpga=0; station<=4 && fpga<5; station++) {
-        if(station==1)
-            for(int subSector=0; subSector<2 && fpga<5; subSector++)
-                srLUTs_[fpga++][1] = new CSCSectorReceiverLUT(endcap,sector,subSector+1,
+    for(int sector=0; sector<6; sector++) {
+        for(int station=1,fpga=0; station<=4 && fpga<5; station++) {
+            if(station==1)
+                for(int subSector=0; subSector<2 && fpga<5; subSector++)
+                    srLUTs_[fpga++][1][sector] = new CSCSectorReceiverLUT(endcap,sector+1,subSector+1,
+                            station, srLUTset, TMB07);
+            else
+                srLUTs_[fpga++][1][sector]   = new CSCSectorReceiverLUT(endcap,  sector+1,   0,
                         station, srLUTset, TMB07);
-        else
-            srLUTs_[fpga++][1]   = new CSCSectorReceiverLUT(endcap,  sector,   0,
-                    station, srLUTset, TMB07);
+        }
     }
 
     // negative endcap
     endcap = 2;
-    for(int station=1,fpga=0; station<=4 && fpga<5; station++) {
-        if(station==1)
-            for(int subSector=0; subSector<2 && fpga<5; subSector++)
-                srLUTs_[fpga++][0] = new CSCSectorReceiverLUT(endcap,sector,subSector+1,
+    for(int sector=0; sector<6; sector++) {
+        for(int station=1,fpga=0; station<=4 && fpga<5; station++) {
+            if(station==1)
+                for(int subSector=0; subSector<2 && fpga<5; subSector++)
+                    srLUTs_[fpga++][0][sector] = new CSCSectorReceiverLUT(endcap,sector+1,subSector+1,
+                            station, srLUTset, TMB07);
+            else
+                srLUTs_[fpga++][0][sector]   = new CSCSectorReceiverLUT(endcap,  sector+1,   0,
                         station, srLUTset, TMB07);
-        else
-            srLUTs_[fpga++][0]   = new CSCSectorReceiverLUT(endcap,  sector,   0,
-                    station, srLUTset, TMB07);
+        }
     }
 
 
@@ -179,7 +184,8 @@ OfflineDQMCSCTF::~OfflineDQMCSCTF()
     //free the CSCTF array of pointers
     for(unsigned int j=0; j<2; j++)
         for(unsigned int i=0; i<5; i++)
-            delete srLUTs_[i][j];
+            for(unsigned int s=0; s<6; s++)
+                delete srLUTs_[i][j][s];
 
 }
 
@@ -321,21 +327,21 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
             lclphidat lclPhi;
             try {
-                lclPhi = srLUTs_[fpga][EndCapLUT]->localPhi(lct->getStrip(), lct->getPattern(), lct->getQuality(), lct->getBend(), gangedME1a_);
+                lclPhi = srLUTs_[fpga][EndCapLUT][sector]->localPhi(lct->getStrip(), lct->getPattern(), lct->getQuality(), lct->getBend(), gangedME1a_);
             } catch(cms::Exception &) {
                 bzero(&lclPhi,sizeof(lclPhi));
             }
 
             gblphidat gblPhi;
             try {
-                gblPhi = srLUTs_[fpga][EndCapLUT]->globalPhiME(lclPhi.phi_local, lct->getKeyWG(), cscId+1, gangedME1a_);
+                gblPhi = srLUTs_[fpga][EndCapLUT][sector]->globalPhiME(lclPhi.phi_local, lct->getKeyWG(), cscId+1, gangedME1a_);
             } catch(cms::Exception &) {
                 bzero(&gblPhi,sizeof(gblPhi));
             }
 
             gbletadat gblEta;
             try {
-                gblEta = srLUTs_[fpga][EndCapLUT]->globalEtaME(lclPhi.phi_bend_local, lclPhi.phi_local, lct->getKeyWG(), cscId+1, gangedME1a_);
+                gblEta = srLUTs_[fpga][EndCapLUT][sector]->globalEtaME(lclPhi.phi_bend_local, lclPhi.phi_local, lct->getKeyWG(), cscId+1, gangedME1a_);
             } catch(cms::Exception &) {
                 bzero(&gblEta,sizeof(gblEta));
             }
@@ -411,11 +417,11 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 saveCscId_p.push_back(cscId);
                 saveSector_p.push_back(sector);
                 saveBPTX_p.push_back(bx);
-		saveStrip_p.push_back(strip);
-		savekeyWire_p.push_back(keyWire);
-		saveLclPhi_p.push_back(lclPhi.phi_local);
-		savePkdPhi_p.push_back(theStub.phiPacked());
-		savePkdEta_p.push_back(theStub.etaPacked());
+                saveStrip_p.push_back(strip);
+                savekeyWire_p.push_back(keyWire);
+                saveLclPhi_p.push_back(lclPhi.phi_local);
+                savePkdPhi_p.push_back(theStub.phiPacked());
+                savePkdEta_p.push_back(theStub.etaPacked());
             } else if(endcap==1) {
                 saveEndcaps_m.push_back(endcap);
                 saveStations_m.push_back(station);
@@ -474,7 +480,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 ev.lct_m_endcap[ev.nlcts_m] = saveEndcaps_m[j];
                 ev.lct_m_station[ev.nlcts_m]= saveStations_m[j];
                 ev.lct_m_ring[ev.nlcts_m]   = saveRings_m[j];
-		ev.lct_m_cscid[ev.nlcts_m]  = saveCscId_m[j];
+                ev.lct_m_cscid[ev.nlcts_m]  = saveCscId_m[j];
                 ev.lct_m_sector[ev.nlcts_m] = saveSector_m[j];
                 ev.lct_m_bptx[ev.nlcts_m]   = saveBPTX_m[j];
 
@@ -523,15 +529,15 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 ev.lct_p_endcap[ev.nlcts_p] = saveEndcaps_p[j];
                 ev.lct_p_station[ev.nlcts_p]= saveStations_p[j];
                 ev.lct_p_ring[ev.nlcts_p]   = saveRings_p[j];
-		ev.lct_p_cscid[ev.nlcts_p]  = saveCscId_p[j];
+                ev.lct_p_cscid[ev.nlcts_p]  = saveCscId_p[j];
                 ev.lct_p_sector[ev.nlcts_p] = saveSector_p[j];
                 ev.lct_p_bptx[ev.nlcts_p]   = saveBPTX_p[j];
 
-		ev.lct_p_strip[ev.nlcts_p]   = saveStrip_p[j];
-		ev.lct_p_keywire[ev.nlcts_p] = savekeyWire_p[j];
-		ev.lct_p_lclphi[ev.nlcts_p]  = saveLclPhi_p[j];
-		ev.lct_p_pkdphi[ev.nlcts_p]  = savePkdPhi_p[j];
-		ev.lct_p_pkdeta[ev.nlcts_p]  = savePkdEta_p[j];
+                ev.lct_p_strip[ev.nlcts_p]   = saveStrip_p[j];
+                ev.lct_p_keywire[ev.nlcts_p] = savekeyWire_p[j];
+                ev.lct_p_lclphi[ev.nlcts_p]  = saveLclPhi_p[j];
+                ev.lct_p_pkdphi[ev.nlcts_p]  = savePkdPhi_p[j];
+                ev.lct_p_pkdeta[ev.nlcts_p]  = savePkdEta_p[j];
 
                 ev.nlcts_p++;
             }

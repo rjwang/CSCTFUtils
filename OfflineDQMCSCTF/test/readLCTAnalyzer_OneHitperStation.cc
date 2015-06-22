@@ -62,8 +62,8 @@ getDeltaPhiEta(double *par, double phi, double eta, double z)
 
 
     // delta Eta
-    double r = sqrt(x*x+y*y);
-    double cal_theta = TMath::ATan( fabs(r/z) );
+    double rho = sqrt(x*x+y*y);
+    double cal_theta = TMath::ATan( fabs(rho/z) );
     double cal_eta = (-1.)*log( TMath::Tan( cal_theta/2. ) );
 
     if(z<0) cal_eta = -1.*fabs(cal_eta);
@@ -83,9 +83,9 @@ getDeltaPhiEta(double *par, double phi, double eta, double z)
 double getDistance(double *par, double phi, double eta, double z)
 {
     double theta = 2*TMath::ATan(exp(-1.*eta));
-    double r = fabs(z*TMath::Tan(theta));
-    double y = r*TMath::Sin(phi);
-    double x = r*TMath::Cos(phi);
+    double rho = fabs(z*TMath::Tan(theta));
+    double y = rho*TMath::Sin(phi);
+    double x = rho*TMath::Cos(phi);
 
     if(phi>=0                  && phi<M_PI/2. )       {
         x=fabs(x);
@@ -182,9 +182,9 @@ dofit(std::vector<double> allphiG, std::vector<double> alletaG, std::vector<doub
             double theta = 2.*TMath::ATan(exp(-1.*etaG));
 
             double z = zG;
-	    double r = fabs(z*TMath::Tan(theta));
-	    double y = r*TMath::Sin(phiG);
-	    double x = r*TMath::Cos(phiG);
+	    double rho = fabs(z*TMath::Tan(theta));
+	    double y = rho*TMath::Sin(phiG);
+	    double x = rho*TMath::Cos(phiG);
 
             if(phiG>=0 			&& phiG<M_PI/2.	) 	{
                 x=fabs(x);
@@ -547,18 +547,19 @@ void readLCTAnalyzer_OneHitperStation(TString _input_="./csctf_Run246926.root", 
 
 
 
+    // fitting parameters
 
-    TH1F* h_m_dr0 = new TH1F("h_m_dr0",";Distance to IP [mm], all ME-;Events",500,0,2000);
-    TH1F* h_p_dr0 = new TH1F("h_p_dr0",";Distance to IP [mm], all ME+;Events",500,0,2000);
+    TH1F* h_m_dr0 = new TH1F("h_m_dr0",";Distance to IP [mm], ME-;Events",500,0,2000);
+    TH1F* h_p_dr0 = new TH1F("h_p_dr0",";Distance to IP [mm], ME+;Events",500,0,2000);
 
-    TH1F* h_m_chi2 = new TH1F("h_m_chi2",";Chi2 [mm], all ME-;Events",500,0,1);
-    TH1F* h_p_chi2 = new TH1F("h_p_chi2",";Chi2 [mm], all ME+;Events",500,0,1);
+    TH1F* h_m_chi2 = new TH1F("h_m_chi2",";#chi^{2} [mm], ME-;Events",500,0,1);
+    TH1F* h_p_chi2 = new TH1F("h_p_chi2",";#chi^{2} [mm], ME+;Events",500,0,1);
 
-    TH1F* h_m_p0 = new TH1F("h_m_p0",";p_{0}, Minus EndCap;Events",500,-2000,2000);
-    TH1F* h_m_p1 = new TH1F("h_m_p1",";p_{1}, Minus EndCap;Events",500,-2000,2000);
-    TH1F* h_m_p2 = new TH1F("h_m_p2",";p_{2}, Minus EndCap;Events",500,-2000,2000);
-    TH1F* h_m_p3 = new TH1F("h_m_p3",";p_{3}, Minus EndCap;Events",500,-2000,2000);
-    TH1F *h_m_distance = new TH1F("h_m_distance",";Distance, Minus EndCap;Events",500,0,2000.);
+    TH1F* h_m_p0 = new TH1F("h_m_p0",";p_{0}, ME-;Events",500,-2000,2000);
+    TH1F* h_m_p1 = new TH1F("h_m_p1",";p_{1}, ME-;Events",500,-2000,2000);
+    TH1F* h_m_p2 = new TH1F("h_m_p2",";p_{2}, ME-;Events",500,-2000,2000);
+    TH1F* h_m_p3 = new TH1F("h_m_p3",";p_{3}, ME-;Events",500,-2000,2000);
+    TH1F *h_m_distance = new TH1F("h_m_distance",";Distance [mm], ME-;Events",500,0,2000.);
 
     TH1F* h_p_p0 = new TH1F("h_p_p0",";p_{0}, Plus EndCap;Events",500,-2000,2000);
     TH1F* h_p_p1 = new TH1F("h_p_p1",";p_{1}, Plus EndCap;Events",500,-2000,2000);

@@ -1,6 +1,7 @@
 //
 //
 #include "/afs/cern.ch/user/r/rewang/MainResults/AnaCode/plotPost.h"
+#include "/afs/cern.ch/user/r/rewang/Utils.h"
 
 
 
@@ -13,8 +14,8 @@ void plotter(TString Input="output_test.root")
 
     vector<TString> All1Dhists;
 
-    All1Dhists.push_back("h_deltaPhi");
-    All1Dhists.push_back("h_deltaEta");
+    //All1Dhists.push_back("h_deltaPhi");
+    //All1Dhists.push_back("h_deltaEta");
 
     All1Dhists.push_back("h_deltaPhiMEp11");
     All1Dhists.push_back("h_deltaPhiMEp11a");
@@ -265,6 +266,10 @@ void plotter(TString Input="output_test.root")
         t1->SetLogy(1);
         //c->Divide(1,2);
 
+	if(All1Dhists[ihist].Contains("h_deltaEtaME")) hist_2->Rebin(4);
+	if(All1Dhists[ihist].Contains("h_deltaPhiME")) hist_2->Rebin(4);
+
+
 
         hist_2->Draw("");
 
@@ -282,6 +287,7 @@ void plotter(TString Input="output_test.root")
         if(All1Dhists[ihist].Contains("MEp") || All1Dhists[ihist].Contains("_p_")) hist_2->SetFillColor(kGreen-7);
         if(All1Dhists[ihist].Contains("MEm") || All1Dhists[ihist].Contains("_m_")) hist_2->SetFillColor(kOrange-3);
 
+	addText(0.2,0.90,0.95,0.987,"CMS #it{Preliminary}, #sqrt{s} = 13 TeV, B = 0 T",kBlack,0);
 
         c->Modified();
         c->Update();
@@ -339,6 +345,7 @@ void plotter(TString Input="output_test.root")
         stats->SetTextColor(2);
 
 
+	addText(0.2,0.90,0.95,0.987,"CMS #it{Preliminary}, #sqrt{s} = 13 TeV, B = 0 T",kBlack,0);
 
 
         c->SaveAs(All2Dhists[ihist]+".png");
