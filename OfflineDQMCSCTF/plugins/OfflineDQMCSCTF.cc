@@ -67,10 +67,19 @@
 #include <vector>
 #include <unistd.h>
 
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/Common/interface/MergeableCounter.h"
+#include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
+
 #include "CSCTFUtils/OfflineDQMCSCTF/interface/DataEvtSummaryHandler.h"
 //
 // class declaration
 //
+using namespace edm;
+using namespace reco;
+using namespace pat;
+using namespace std;
 
 class OfflineDQMCSCTF : public edm::EDAnalyzer {
 public:
@@ -87,6 +96,7 @@ private:
 
     bool gangedME1a_;
     bool verbose_;
+    edm::InputTag GenParticles_;
     //CSCSectorReceiverLUT *srLUTs_[5];
     //CSCSectorReceiverLUT* srLUTs_[5][2];
     CSCSectorReceiverLUT* srLUTs_[5][2][6];
@@ -119,6 +129,7 @@ private:
 //
 OfflineDQMCSCTF::OfflineDQMCSCTF(const edm::ParameterSet& iConfig) :
 //    lctProducer( iConfig.getParameter< edm::InputTag >("lctProducer") )
+    GenParticles_( iConfig.getUntrackedParameter<edm::InputTag>("GenParticles")),
     corrlctsToken_(	consumes<CSCCorrelatedLCTDigiCollection>(iConfig.getParameter< edm::InputTag >("lctProducer")) )
 {
     //now do what ever initialization is needed
@@ -211,6 +222,36 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     ev.event  = iEvent.id().event();
 
 
+    //
+    // gen particles
+    //
+    edm::Handle< std::vector<reco::GenParticle> > genParticles;
+    iEvent.getByLabel(GenParticles_, genParticles);
+    if(!genParticles.isValid())     cerr << "  WARNING: genParticles is not valid! " << endl;
+    else {
+        ev.nmcparticles = 0;
+        for(size_t i=0; i<genParticles->size(); i++) {
+            const Candidate * genParticle = &(*genParticles)[i];
+            int status=genParticle->status();
+            int pid=genParticle->pdgId();
+            if(status!=1 || abs(pid)!=13) continue; // PYTHIA 6 based
+
+            ev.mc_px[ev.nmcparticles] = genParticle->px();
+            ev.mc_py[ev.nmcparticles] = genParticle->py();
+            ev.mc_pz[ev.nmcparticles] = genParticle->pz();
+
+	    ev.mc_vx[ev.nmcparticles] = genParticle->vx();
+	    ev.mc_vy[ev.nmcparticles] = genParticle->vy();
+	    ev.mc_vz[ev.nmcparticles] = genParticle->vz();
+
+            ev.mc_en[ev.nmcparticles] = genParticle->energy();
+            ev.mc_id[ev.nmcparticles] = genParticle->pdgId();
+            ev.mc_status[ev.nmcparticles] = genParticle->status();
+            ev.nmcparticles++;
+        }
+    }
+
+
     edm::ESHandle<CSCGeometry> cscGeometry;
     iSetup.get<MuonGeometryRecord>().get(cscGeometry);
 
@@ -227,6 +268,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     std::vector<int> saveRings_m;
     std::vector<int> saveCscId_m;
     std::vector<int> saveSector_m;
+    std::vector<int> saveSubSector_m;
     std::vector<double> saveGblPhi_m;
     std::vector<double> saveGblEta_m;
     std::vector<double> saveGblZ_m;
@@ -242,6 +284,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     std::vector<int> saveRings_p;
     std::vector<int> saveCscId_p;
     std::vector<int> saveSector_p;
+    std::vector<int> saveSubSector_p;
     std::vector<double> saveGblPhi_p;
     std::vector<double> saveGblEta_p;
     std::vector<double> saveGblZ_p;
@@ -416,6 +459,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 saveGblZ_p.push_back(globalZ);
                 saveCscId_p.push_back(cscId);
                 saveSector_p.push_back(sector);
+		saveSubSector_p.push_back(subSector);
                 saveBPTX_p.push_back(bx);
                 saveStrip_p.push_back(strip);
                 savekeyWire_p.push_back(keyWire);
@@ -431,6 +475,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 saveGblZ_m.push_back(globalZ);
                 saveCscId_m.push_back(cscId);
                 saveSector_m.push_back(sector);
+		saveSubSector_m.push_back(subSector);
                 saveBPTX_m.push_back(bx);
                 saveStrip_m.push_back(strip);
                 savekeyWire_m.push_back(keyWire);
@@ -482,6 +527,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 ev.lct_m_ring[ev.nlcts_m]   = saveRings_m[j];
                 ev.lct_m_cscid[ev.nlcts_m]  = saveCscId_m[j];
                 ev.lct_m_sector[ev.nlcts_m] = saveSector_m[j];
+		ev.lct_m_subsector[ev.nlcts_m] = saveSubSector_m[j];
                 ev.lct_m_bptx[ev.nlcts_m]   = saveBPTX_m[j];
 
                 ev.lct_m_strip[ev.nlcts_m]   = saveStrip_m[j];
@@ -531,6 +577,7 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 ev.lct_p_ring[ev.nlcts_p]   = saveRings_p[j];
                 ev.lct_p_cscid[ev.nlcts_p]  = saveCscId_p[j];
                 ev.lct_p_sector[ev.nlcts_p] = saveSector_p[j];
+		ev.lct_p_subsector[ev.nlcts_p] = saveSubSector_p[j];
                 ev.lct_p_bptx[ev.nlcts_p]   = saveBPTX_p[j];
 
                 ev.lct_p_strip[ev.nlcts_p]   = saveStrip_p[j];
