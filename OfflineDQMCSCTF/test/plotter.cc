@@ -71,13 +71,13 @@ void plotter(TString Input="output_test.root")
     All1Dhists.push_back("h_m_p1");
     All1Dhists.push_back("h_m_p2");
     All1Dhists.push_back("h_m_p3");
-    All1Dhists.push_back("h_m_distance");
+    All1Dhists.push_back("h_m_dFitMuon");
 
     All1Dhists.push_back("h_p_p0");
     All1Dhists.push_back("h_p_p1");
     All1Dhists.push_back("h_p_p2");
     All1Dhists.push_back("h_p_p3");
-    All1Dhists.push_back("h_p_distance");
+    All1Dhists.push_back("h_p_dFitMuon");
 
 
 
@@ -114,7 +114,10 @@ void plotter(TString Input="output_test.root")
     All1Dhists.push_back("h_m_chi2");
     All1Dhists.push_back("h_p_chi2");
 
+    All1Dhists.push_back("h_p_dGenMuon");
 
+    All1Dhists.push_back("h_deltaGenPhiMEp42");
+    All1Dhists.push_back("h_deltaGenEtaMEp42");
 
 
     vector<TString> All2Dhists;
