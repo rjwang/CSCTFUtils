@@ -119,6 +119,9 @@ void plotter(TString Input="output_test.root")
     All1Dhists.push_back("h_deltaGenPhiMEp42");
     All1Dhists.push_back("h_deltaGenEtaMEp42");
 
+    All1Dhists.push_back("h_deltaGenPhiMEp32");
+    All1Dhists.push_back("h_deltaGenEtaMEp32");
+
 
     vector<TString> All2Dhists;
     All2Dhists.push_back("h_deltaEtavsPhi_MEp");

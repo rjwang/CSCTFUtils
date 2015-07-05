@@ -6,6 +6,7 @@ process.OfflineDQMCSCTF = cms.EDAnalyzer('OfflineDQMCSCTF',
 	lctProducer = cms.InputTag("csctfDigis"),
 	dtag = cms.string('csctf'),
 	GenParticles = cms.untracked.InputTag("genParticles"),
+	MuonTag = cms.untracked.InputTag("muons"),
 	verbose = cms.untracked.bool(False),
 	gangedME1a = cms.untracked.bool(False)
 )

@@ -614,6 +614,10 @@ void readLCTAnalyzer_MC_OneHitperStation(TString _input_="./csctf_Run246926.root
     TH1F* h_deltaGenPhiMEp42 = new TH1F("h_deltaGenPhiMEp42",";#it{#phi}(Gen) - #it{#phi}(LUT) [rad], ME+4/2;Events",500,-.8,.8);
     TH1F* h_deltaGenEtaMEp42 = new TH1F("h_deltaGenEtaMEp42",";#it{#eta}(Gen) - #it{#eta}(LUT), ME+4/2;Events",500,-0.8,0.8);
 
+    TH1F* h_deltaGenPhiMEp32 = new TH1F("h_deltaGenPhiMEp32",";#it{#phi}(Gen) - #it{#phi}(LUT) [rad], ME+3/2;Events",500,-.8,.8);
+    TH1F* h_deltaGenEtaMEp32 = new TH1F("h_deltaGenEtaMEp32",";#it{#eta}(Gen) - #it{#eta}(LUT), ME+3/2;Events",500,-0.8,0.8);
+
+
 
     TH1F* h_deltaPhiMEpSec0 = new TH1F("h_deltaPhiMEpSec0",";#it{#phi}(Fit) - #it{#phi}(LUT) [rad], ME+, Sector 0;Events",500,-.8,.8);
     TH1F* h_deltaPhiMEpSec1 = new TH1F("h_deltaPhiMEpSec1",";#it{#phi}(Fit) - #it{#phi}(LUT) [rad], ME+, Sector 1;Events",500,-.8,.8);
@@ -1166,6 +1170,9 @@ void readLCTAnalyzer_MC_OneHitperStation(TString _input_="./csctf_Run246926.root
 			h_dEtavsFitEta_MEp32 -> Fill(caleta,d_eta);
 			h_dEtavsLUTEta_MEp32 -> Fill(raweta,d_eta);
 			h_dPhivsFitPhi_MEp32 -> Fill(calphi*180./M_PI,d_phi);
+
+                        h_deltaGenPhiMEp32 -> Fill(dphi_gen);
+                        h_deltaGenEtaMEp32 -> Fill(deta_gen);
                     }
                     if(endcap == 1) {
                         outfile << " ME_M_3_2" << endl;
@@ -1462,6 +1469,10 @@ void readLCTAnalyzer_MC_OneHitperStation(TString _input_="./csctf_Run246926.root
 
     h_deltaGenPhiMEp42->Write();
     h_deltaGenEtaMEp42->Write();
+
+    h_deltaGenPhiMEp32->Write();
+    h_deltaGenEtaMEp32->Write();
+
 
 
     h_dPhivsFitPhi_MEp11->Write();
