@@ -247,8 +247,9 @@ OfflineDQMCSCTF::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
         }
     }
 
-
+    //
     // Reco Muons
+    //
     edm::Handle< std::vector<reco::Muon> > recoMuons;
     iEvent.getByLabel(MuonTag_, recoMuons);
     if(recoMuons.isValid()) {
